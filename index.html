@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Salon App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════ */
+    :root {
+      --gold:         #C9A84C;
+      --gold-light:   #E2C97E;
+      --gold-dim:     rgba(201,168,76,0.12);
+      --gold-border:  rgba(201,168,76,0.28);
+      --bg:           #0D0D0D;
+      --bg-card:      #141414;
+      --bg-elevated:  #1C1C1C;
+      --bg-input:     #181818;
+      --text:         #F0EDE6;
+      --text-muted:   #8A8070;
+      --text-dim:     #5A5550;
+      --border:       #252220;
+      --border-hover: #3A3530;
+      --success:      #4CAF82;
+      --danger:       #C94C4C;
+      --whatsapp:     #25D366;
+      --radius:       12px;
+      --radius-sm:    8px;
+      --radius-xs:    6px;
+      --shadow:       0 8px 32px rgba(0,0,0,0.5);
+      --shadow-sm:    0 2px 12px rgba(0,0,0,0.35);
+      --tr:           0.18s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gold-border); }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 90;
+      -webkit-app-region: drag;
+    }
+    .topbar > * { -webkit-app-region: no-drag; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px; font-weight: 700; color: #0D0D0D;
+      flex-shrink: 0;
+    }
+    .brand-mark img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+    .brand-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 600; color: var(--text);
+      letter-spacing: 0.02em;
+    }
+    .brand-name span { color: var(--gold); }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .badge-pro {
+      background: var(--gold-dim); border: 1px solid var(--gold-border);
+      color: var(--gold); font-size: 9px; font-weight: 700;
+      letter-spacing: 0.12em; padding: 2px 8px; border-radius: 20px;
+      text-transform: uppercase;
+    }
+
+    /* ── INCOME STRIP ── */
+    .income-strip {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .income-strip-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-dim); margin-right: 6px;
+    }
+    .income-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 7px 16px;
+      display: flex; flex-direction: column; gap: 1px;
+      transition: border-color var(--tr);
+    }
+    .income-card:hover { border-color: var(--gold-border); }
+    .income-card .ic-label {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-dim);
+    }
+    .income-card .ic-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 600; color: var(--gold); line-height: 1.2;
+    }
+    .income-card .ic-value small { font-size: 13px; }
+    .income-divider { width: 1px; height: 34px; background: var(--border); margin: 0 5px; }
+
+    /* ── MAIN LAYOUT ── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 370px 1fr;
+      gap: 18px;
+      padding: 20px 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .left-col  { display: flex; flex-direction: column; gap: 16px; }
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .card-title .ct-dot {
+      width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0;
+    }
+    .card-body { padding: 18px; }
+
+    /* ── FORM ELEMENTS ── */
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-dim);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select,
+    #phone,
+    #name,
+    #serviceName,
+    #servicePrice,
+    #searchInput,
+    #offerMessage {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 9px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      width: 100%;
+      outline: none;
+      transition: border-color var(--tr), box-shadow var(--tr);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-dim); }
+
+    /* ── PHONE + SUGGESTIONS ── */
+    /* The wrapper is full-width, so #suggestionsBox width:100% matches the input */
+    .phone-wrap { position: relative; width: 100%; }
+    #phone { font-size: 14px; letter-spacing: 0.04em; width: 100%; }
+
+    /* Override any inline styles set on suggestionsBox by renderer.js */
+    #suggestionsBox {
+      position: absolute !important;
+      top: calc(100% + 3px) !important;
+      left: 0 !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-height: 130px !important;
+      overflow-y: auto !important;
+      z-index: 200 !important;
+      background: var(--bg-elevated) !important;
+      border: 1px solid var(--gold-border) !important;
+      border-radius: var(--radius-sm) !important;
+      box-shadow: var(--shadow) !important;
+      scroll-behavior: smooth;
+    }
+    #suggestionsBox > * {
+      padding: 9px 13px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      transition: background var(--tr), color var(--tr);
+      display: block;
+    }
+    #suggestionsBox > *:last-child { border-bottom: none; }
+    #suggestionsBox > *:hover { background: var(--gold-dim); color: var(--gold); }
+
+    /* ── LAST VISIT PILL ── */
+    #lastVisitInfo {
+      background: var(--gold-dim) !important;
+      border: 1px solid var(--gold-border) !important;
+      border-radius: var(--radius-sm) !important;
+      color: var(--gold) !important;
+      font-size: 12px !important;
+      padding: 8px 12px !important;
+      margin: 0 0 13px !important;
+    }
+
+    /* ── SERVICES CHIPS ── */
+    #servicesContainer {
+      display: flex; flex-wrap: wrap; gap: 7px;
+      margin-bottom: 14px;
+    }
+    #servicesContainer button {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      padding: 6px 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+    #servicesContainer button:hover {
+      border-color: var(--gold-border); color: var(--gold); transform: translateY(-1px);
+    }
+
+    /* ── TOTAL ROW ── */
+    .total-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 15px;
+      margin-bottom: 14px;
+    }
+    .total-row .tr-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-dim);
+    }
+    .total-row .tr-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 25px; font-weight: 700; color: var(--gold);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none;
+      transition: all var(--tr);
+      white-space: nowrap; user-select: none;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #0D0D0D; font-weight: 700;
+      box-shadow: 0 2px 12px rgba(201,168,76,0.2);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0) scale(0.97); }
+    .btn-save { width: 100%; padding: 12px; font-size: 14px; letter-spacing: 0.02em; }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .btn-secondary:hover { border-color: var(--gold-border); color: var(--gold); }
+
+    .btn-ghost {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-muted); padding: 7px 13px; font-size: 12px;
+    }
+    .btn-ghost:hover { border-color: var(--gold-border); color: var(--gold); }
+
+    .btn-danger {
+      background: rgba(201,76,76,0.1);
+      border: 1px solid rgba(201,76,76,0.22);
+      color: var(--danger); font-size: 12px; padding: 7px 13px;
+    }
+    .btn-danger:hover { background: rgba(201,76,76,0.18); }
+
+    .btn-wa {
+      background: rgba(37,211,102,0.1);
+      border: 1px solid rgba(37,211,102,0.22);
+      color: var(--whatsapp); font-size: 12px; padding: 5px 12px;
+    }
+    .btn-wa:hover { background: rgba(37,211,102,0.18); }
+
+    .btn-settings {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-muted); padding: 7px 14px;
+      border-radius: var(--radius-sm); cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 12px;
+      display: flex; align-items: center; gap: 6px;
+      transition: all var(--tr);
+    }
+    .btn-settings:hover { border-color: var(--gold); color: var(--gold); }
+
+    .action-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .action-row .btn { flex: 1; }
+
+    /* ── WHATSAPP TOGGLE ── */
+    .wa-toggle {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px; cursor: pointer;
+      transition: border-color var(--tr);
+    }
+    .wa-toggle:hover { border-color: rgba(37,211,102,0.3); }
+    .wa-toggle span { font-size: 12px; color: var(--text-muted); }
+    #autoWhatsapp { accent-color: var(--whatsapp); width: auto; margin: 0; }
+
+    /* ── STATUS ── */
+    #status {
+      text-align: center; font-size: 12px; min-height: 18px;
+      color: var(--success) !important;
+      margin-top: 8px;
+    }
+
+    /* ── DIVIDER ── */
+    .sep { height: 1px; background: var(--border); margin: 14px 0; }
+
+    /* ── HISTORY BOX ── */
+    #historyBox {
+      display: flex; flex-direction: column; gap: 7px;
+      margin-top: 12px;
+      max-height: 320px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      padding-right: 2px;
+    }
+    #historyBox:empty::after {
+      content: 'No history found';
+      display: block; text-align: center;
+      padding: 30px 0; color: var(--text-dim); font-size: 13px;
+    }
+    #historyBox > div {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 13px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color var(--tr), background var(--tr);
+    }
+    #historyBox > div:hover { border-color: var(--gold-border); background: rgba(255,255,255,0.02); }
+
+    /* ── DATE FILTER ROW ── */
+    .date-filter-row { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+    .date-filter-row input[type="date"] { flex: 1; min-width: 120px; }
+
+    /* ── OFFER SECTION ── */
+    #offerMessage { resize: vertical; min-height: 68px; }
+    .filter-row {
+      display: flex; gap: 7px; align-items: center; flex-wrap: wrap; margin-top: 12px;
+    }
+    #filterType { flex: 1; min-width: 140px; }
+    #searchInput { flex: 1; min-width: 130px; }
+
+    /* ── CUSTOMER LIST ── */
+    #customerList {
+      max-height: 320px;
+      overflow-y: auto; scroll-behavior: smooth;
+      display: flex; flex-direction: column; gap: 6px;
+      margin-top: 12px; padding-right: 2px;
+    }
+    #customerList:empty::after {
+      content: 'No customers found';
+      display: block; text-align: center;
+      padding: 30px 0; color: var(--text-dim); font-size: 13px;
+    }
+    #customerList > div {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 13px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color var(--tr), background var(--tr);
+    }
+    #customerList > div:hover { border-color: var(--gold-border); background: rgba(255,255,255,0.02); }
+
+    /* ── DATA TOOLS ── */
+    .data-tools { display: flex; gap: 7px; flex-wrap: wrap; }
+    .data-tools .btn { flex: 1; min-width: 90px; }
+
+    /* ── SERVICE LIST (inside modal) ── */
+    #serviceList {
+      max-height: 300px;
+      overflow-y: auto; scroll-behavior: smooth;
+      display: flex; flex-direction: column; gap: 6px;
+      padding-right: 2px;
+    }
+    #serviceList:empty::after {
+      content: 'No services yet — add one above';
+      display: block; text-align: center;
+      padding: 30px 0; color: var(--text-dim); font-size: 13px;
+    }
+    #serviceList > div {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 13px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color var(--tr), background var(--tr);
+    }
+    #serviceList > div:hover { border-color: var(--gold-border); background: rgba(255,255,255,0.02); }
+
+    /* ── MODAL ── */
+    #serviceModal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 500;
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    #serviceModal.open { display: flex; }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--gold-border);
+      border-radius: 16px;
+      width: 460px; max-width: 100%; max-height: 85vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(201,168,76,0.08);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 600; color: var(--text);
+    }
+    .modal-close {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-muted); width: 28px; height: 28px;
+      border-radius: var(--radius-xs); cursor: pointer; font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--tr); flex-shrink: 0;
+    }
+    .modal-close:hover { border-color: var(--danger); color: var(--danger); }
+
+    .modal-body {
+      padding: 22px;
+      overflow-y: auto; scroll-behavior: smooth;
+      flex: 1;
+    }
+    .modal-add-row {
+      display: flex; gap: 8px; align-items: flex-end; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .modal-add-row .field { flex: 1; min-width: 110px; margin-bottom: 0; }
+    .modal-add-row .field-price { max-width: 105px; flex: none; }
+    .modal-add-row .btn { flex-shrink: 0; height: 38px; align-self: flex-end; }
+
+    /* ── BOTTOM BAR ── */
+    .bottom-bar {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 9px 24px;
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--text-dim);
+    }
+
+    .customer-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #1e1e1e;
+  color: #eee;
+  transition: all 0.2s ease;
+}
+
+/* 🔥 Hover */
+.customer-row:hover {
+  background: #2a2a2a;
+}
+
+/* ⭐ VIP (frequent customers) */
+.customer-row.vip {
+  background: #3a2f0b;
+  color: #ffd700;
+  font-weight: 500;
+}
+
+/* ⚠️ Inactive */
+.customer-row.inactive {
+  background: #3a1a1a;
+  color: #ff6b6b;
+}
+.report-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.report-actions .btn {
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
+/* BACKDROP */
+.report-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.report-modal.open {
+  display: flex;
+}
+
+/* BOX */
+.report-box {
+  width: 380px;
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* HEADER */
+.report-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.report-header button {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.report-header button:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* BODY */
+.report-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-body label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.report-body select,
+.report-body input {
+  width: 100%;
+}
+
+.report-body button {
+  margin-top: 10px;
+}
+    /* ── FADE IN ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card { animation: fadeUp 0.25s ease both; }
+    .left-col  .card:nth-child(2) { animation-delay: 0.05s; }
+    .right-col .card:nth-child(2) { animation-delay: 0.1s;  }
+  </style>
+</head>
+<body>
+
+<!-- ══════ SERVICE MANAGEMENT MODAL ══════ -->
+<!-- Clicking the backdrop (the overlay itself) closes the modal -->
+<div id="serviceModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">✦ Service Management</span>
+      <button class="modal-close" onclick="document.getElementById('serviceModal').classList.remove('open')" title="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-add-row">
+        <div class="field">
+          <span class="field-label">Service Name</span>
+          <input id="serviceName" placeholder="e.g. Haircut, Facial…" />
+        </div>
+        <div class="field field-price">
+          <span class="field-label">Price ₹</span>
+          <input id="servicePrice" placeholder="0" type="number" />
+        </div>
+        <button class="btn btn-primary" style="width:auto;padding:0 18px;height:38px;" onclick="addNewService()">+ Add</button>
+      </div>
+      <div id="serviceList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TOPBAR ══════ -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">
+  <img src="/assets/favicon (1).ico" alt="Salon Logo" />
+</div>
+    <span class="brand-name">Iron<span>Star</span></span>
+  </div>
+  <div class="topbar-right">
+    <span class="badge-pro">PRO</span>
+    <button class="btn-settings" onclick="document.getElementById('serviceModal').classList.add('open')">
+      ⚙&thinsp;Services &amp; Pricing
+    </button>
+    <button class="btn btn-ghost" onclick="backupData()">⬆ Backup</button>
+    <button class="btn btn-ghost" onclick="restoreData()">⬇ Restore</button>
+  </div>
+</header>
+
+<!-- ══════ INCOME STRIP ══════ -->
+<div class="income-strip">
+  <span class="income-strip-label">Income</span>
+  <div class="income-card">
+    <span class="ic-label">Today</span>
+    <span class="ic-value"><small>₹</small><span id="todayIncome">0</span></span>
+  </div>
+  <div class="income-divider"></div>
+  <div class="income-card">
+    <span class="ic-label">This Week</span>
+    <span class="ic-value"><small>₹</small><span id="weekIncome">0</span></span>
+  </div>
+  <div class="income-divider"></div>
+  <div class="income-card">
+    <span class="ic-label">This Month</span>
+    <span class="ic-value"><small>₹</small><span id="monthIncome">0</span></span>
+  </div>
+  <div class="report-actions">
+  <button class="btn btn-secondary" onclick="exportVisits()">📊 Export Visits</button>
+  <button class="btn btn-primary" onclick="openReportModal()">⬇ Download Report</button>
+</div>
+ <div id="reportModal" class="report-modal">
+  <div class="report-box">
+
+    <div class="report-header">
+      <span>📊 Download Report</span>
+      <button onclick="closeReportModal()">✕</button>
+    </div>
+
+    <div class="report-body">
+
+      <label>Report Type</label>
+      <select id="reportType" onchange="handleReportType()">
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+        <option value="custom">Custom Range</option>
+      </select>
+
+      <div id="customDates" style="display:none;">
+        <input type="date" id="reportFrom" />
+        <input type="date" id="reportTo" />
+      </div>
+
+      <button class="btn btn-primary" onclick="downloadReport()">
+        ⬇ Download
+      </button>
+
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════ MAIN ══════ -->
+<main class="main-layout">
+
+  <!-- LEFT: QUICK ENTRY -->
+  <div class="left-col">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><span class="ct-dot"></span>Quick Entry</span>
+      </div>
+      <div class="card-body">
+
+        <!-- Phone (wrapped for responsive suggestions dropdown) -->
+        <div class="field">
+          <span class="field-label">Phone Number</span>
+          <div class="phone-wrap" style="position:relative;width:100%;">
+            <input id="phone" maxlength="10" inputmode="numeric" placeholder="Enter customer phone…" type="text" />
+            <div id="suggestionsBox" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Name -->
+        <div class="field">
+          <span class="field-label">Customer Name</span>
+          <input id="name" placeholder="Name (if new customer)" />
+        </div>
+
+        <!-- Last visit — JS controls display property -->
+        <p id="lastVisitInfo" style="color:gray;display:none;"></p>
+
+        <div class="sep"></div>
+
+        <!-- Services -->
+        <div class="field-label" style="margin-bottom:8px;">Select Services</div>
+        <div id="servicesContainer"></div>
+
+        <!-- Total -->
+        <div class="total-row">
+          <span class="tr-label">Total Amount</span>
+          <span class="tr-value">₹<span id="total">0</span></span>
+        </div>
+
+        <!-- Secondary actions -->
+        <div class="action-row">
+          <button type="button" class="btn btn-secondary" onclick="repeatLastVisit()">↩ Repeat Last</button>
+          <button type="button" class="btn btn-secondary" onclick="viewHistory()">📋 History</button>
+        </div>
+
+        <!-- WhatsApp toggle -->
+        <label class="wa-toggle">
+          <input type="checkbox" id="autoWhatsapp" />
+          <span>Send WhatsApp receipt after save</span>
+        </label>
+
+        <!-- PRIMARY action -->
+        <button type="button" class="btn btn-primary btn-save" onclick="saveVisit()">✓ Save Visit</button>
+        <p id="status" style="color:green;"></p>
+
+      </div>
+    </div>
+
+    <!-- Data Tools -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><span class="ct-dot"></span>Data Tools</span>
+      </div>
+      <div class="card-body">
+        <div class="data-tools">
+          <button type="button" class="btn btn-ghost" onclick="exportVisits()">⬇ Export Visits</button>
+          <button type="button" class="btn btn-danger"  onclick="clearData()">🗑 Clear Data</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: HISTORY + OFFERS -->
+  <div class="right-col">
+
+    <!-- Visit History -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><span class="ct-dot"></span>Visit History</span>
+      </div>
+      <div class="card-body">
+        <div class="date-filter-row">
+          <input type="date" id="fromDate" />
+          <input type="date" id="toDate" />
+          <button type="button" class="btn btn-secondary" style="padding:8px 14px;font-size:12px;" onclick="filterByDate()">Filter</button>
+        </div>
+        <div id="historyBox"></div>
+      </div>
+    </div>
+
+    <!-- Offer Announcement -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><span class="ct-dot"></span>Offer Announcement</span>
+      </div>
+      <div class="card-body">
+
+        <div class="field">
+          <span class="field-label">Message</span>
+          <textarea id="offerMessage" oninput="toggleSendButtons()" placeholder="Enter your offer or promotion message…"></textarea>
+        </div>
+
+        <div class="filter-row">
+          <select id="filterType">
+            <option value="all">All Customers</option>
+            <option value="today">Visited Today</option>
+            <option value="week">Visited This Week</option>
+            <option value="inactive">Inactive (2+ months)</option>
+          </select>
+          <input type="text" id="searchInput" placeholder="Search name or phone…" oninput="filterCustomers()" />
+          <button type="button" class="btn btn-secondary" style="padding:8px 14px;font-size:12px;" onclick="loadCustomers()">Load</button>
+        </div>
+
+        <div id="customerList"></div>
+
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ══════ BOTTOM BAR ══════ -->
+<footer class="bottom-bar">
+  <span>IronStar · Local Edition</span>
+  <span id="footerDate"></span>
+</footer>
+
+<script>
+  document.getElementById('footerDate').textContent =
+    new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+</script>
+<script src="renderer.js"></script>
+</body>
+</html>
