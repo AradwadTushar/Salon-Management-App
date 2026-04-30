@@ -19,4 +19,5 @@ updateService: (data) => ipcRenderer.invoke('update-service', data),
 getVisitHistory: (phone) => ipcRenderer.invoke('get-visit-history', phone),
 filterByDate: (data) => ipcRenderer.invoke('filter-by-date', data),
  exportReport: (data) => ipcRenderer.invoke("export-report", data),
+ getDashboardStats: () => ipcRenderer.invoke("get-dashboard-stats"),
 });

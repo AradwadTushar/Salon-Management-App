@@ -6,7 +6,65 @@ const path = require('path');
 const fs = require('fs');
 const db = require('./database');
 
+ipcMain.handle("get-dashboard-stats", () => {
+  const today = new Date().toISOString().slice(0, 10);
 
+  const rows = db.prepare(`
+    SELECT total, payment_mode, staff, date
+    FROM visits
+  `).all();
+
+  let todayTotal = 0;
+  let weekTotal = 0;
+  let monthTotal = 0;
+
+  let upi = 0;
+  let cash = 0;
+
+  const staffStats = {};
+
+  const now = new Date();
+
+  rows.forEach(r => {
+    const visitDate = new Date(r.date);
+    const visitDay = visitDate.toISOString().slice(0, 10);
+
+    // TODAY
+    if (visitDay === today) {
+      todayTotal += r.total;
+
+      if (r.payment_mode === "UPI") upi += r.total;
+      if (r.payment_mode === "Cash") cash += r.total;
+
+      const staff = r.staff || "Unknown";
+      if (!staffStats[staff]) staffStats[staff] = 0;
+      staffStats[staff] += r.total;
+    }
+
+    // WEEK
+    const diffDays = (now - visitDate) / (1000 * 60 * 60 * 24);
+    if (diffDays <= 7) {
+      weekTotal += r.total;
+    }
+
+    // MONTH
+    if (
+      visitDate.getMonth() === now.getMonth() &&
+      visitDate.getFullYear() === now.getFullYear()
+    ) {
+      monthTotal += r.total;
+    }
+  });
+
+  return {
+    today: todayTotal,
+    week: weekTotal,
+    month: monthTotal,
+    upi,
+    cash,
+    staffStats
+  };
+});
 // ======================
 // 🖥 WINDOW CREATION
 // ======================
@@ -52,7 +110,7 @@ ipcMain.handle('save-customer', (event, { name, phone }) => {
 // ======================
 
 // 💾 Save visit entry
-ipcMain.handle('save-visit', (event, { phone, services, total }) => {
+ipcMain.handle('save-visit', (event, { phone, services, total, paymentMode, staff }) => {
   let customer = db.prepare(`
     SELECT * FROM customers WHERE phone = ?
   `).get(phone);
@@ -62,9 +120,16 @@ ipcMain.handle('save-visit', (event, { phone, services, total }) => {
   }
 
   db.prepare(`
-    INSERT INTO visits (customer_id, services, total)
-    VALUES (?, ?, ?)
-  `).run(customer.id, services.join(','), total);
+  INSERT INTO visits (customer_id, services, total, payment_mode, staff, date)
+VALUES (?, ?, ?, ?, ?, ?)
+`).run(
+   customer.id,
+  services.join(','),
+  total,
+  paymentMode,
+  staff,
+  new Date().toISOString()
+);
 
   console.log("Saving visit:", phone, services, total);
 
@@ -179,7 +244,12 @@ ipcMain.handle('get-visit-history', (event, phone) => {
   if (!customer) return [];
 
   return db.prepare(`
-    SELECT services, total, date
+    SELECT 
+  services, 
+  total, 
+  payment_mode AS paymentMode, 
+  staff, 
+  date
     FROM visits
     WHERE customer_id = ?
     ORDER BY date DESC
@@ -266,17 +336,21 @@ ipcMain.handle('export-visits', async () => {
 
   try {
     const visits = db.prepare(`
-      SELECT c.name, c.phone, v.services, v.total, v.date
+      SELECT c.name, c.phone, v.services, v.total, v.payment_mode AS paymentMode, v.staff, v.date
       FROM visits v
       JOIN customers c ON v.customer_id = c.id
       ORDER BY v.date DESC
     `).all();
 
-    let csv = "Name,Phone,Services,Total,Date\n";
+    let csv = "Name,Phone,Services,Total,Payment Mode,Staff,Date\n";
 
     visits.forEach(v => {
-      const date = new Date(v.date).toLocaleString('en-IN');
-      csv += `"${v.name}","${v.phone}","${v.services}",${v.total},"${date}"\n`;
+      const date = new Date(v.date).toLocaleString('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  dateStyle: 'medium',
+  timeStyle: 'short'
+})
+      csv += `"${v.name}","${v.phone}","${v.services}",${v.total},"${v.paymentMode || "N/A"}","${v.staff}","${date}"\n`;
     });
 
     fs.writeFileSync(result.filePath, csv);
@@ -299,27 +373,55 @@ ipcMain.handle("export-report", async (event, { from, to }) => {
   if (result.canceled) return;
 
   const rows = db.prepare(`
-    SELECT c.name, c.phone, v.services, v.total, v.date
+    SELECT c.name, c.phone, v.services, v.total, v.payment_mode AS paymentMode, v.staff, v.date
     FROM visits v
     JOIN customers c ON v.customer_id = c.id
     WHERE date(v.date) BETWEEN date(?) AND date(?)
   `).all(from, to);
 
-  let csv = "Name,Phone,Services,Total,Date\n";
+  let csv = "Name,Phone,Services,Total,Payment Mode,Staff,Date\n";
 
-  rows.forEach(r => {
-    const date = new Date(r.date).toLocaleString('en-IN');
-    csv += `"${r.name}","${r.phone}","${r.services}",${r.total},"${date}"\n`;
+  let upiTotal = 0;
+  let cashTotal = 0;
+  const staffStats = {};
+
+  rows.forEach((r, index) => {
+    const date = new Date(r.date).toLocaleString('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  dateStyle: 'medium',
+  timeStyle: 'short'
+})
+
+    csv += `"${r.name}","${r.phone}","${r.services}",${r.total},"${r.paymentMode || "N/A"}","${r.staff || "N/A"}","${date}"\n`;
+
+    // 💰 Payment aggregation
+    if (r.paymentMode === "UPI") upiTotal += r.total;
+    if (r.paymentMode === "Cash") cashTotal += r.total;
+
+    // ✂️ Staff aggregation
+    const staff = r.staff || "Unknown";
+    if (!staffStats[staff]) staffStats[staff] = 0;
+    staffStats[staff] += r.total;
   });
 
+  // Excel total formula (Total column = D)
   const lastRow = rows.length + 1;
-  csv += `\n,,Total,=SUM(D2:D${lastRow}),`;
+  csv += `\n,,Total,=SUM(D2:D${lastRow}),,,`;
+
+  // 🔥 Add insights
+  csv += `\n\n--- PAYMENT SUMMARY ---\n`;
+  csv += `UPI Total,${upiTotal}\n`;
+  csv += `Cash Total,${cashTotal}\n`;
+
+  csv += `\n--- STAFF PERFORMANCE ---\n`;
+  Object.entries(staffStats).forEach(([staff, total]) => {
+    csv += `${staff},${total}\n`;
+  });
 
   fs.writeFileSync(result.filePath, csv);
 
   return { success: true };
 });
-
 
 // ======================
 // 💇 SERVICE MANAGEMENT

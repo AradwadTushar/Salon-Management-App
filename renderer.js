@@ -16,6 +16,11 @@ let services = [];      // List of service names added in current visit
 let allCustomers = [];  // Full customer list loaded for the CRM tab
 let serviceMap = {};    // Maps service name → price for quick lookups (used in repeatLastVisit)
 
+const appState = {
+  staff: "Senior",
+  payment: "UPI"
+};
+
 
 /* =============================================================
    SECTION 2: DOM REFERENCES
@@ -25,7 +30,27 @@ let serviceMap = {};    // Maps service name → price for quick lookups (used i
 const phoneInput = document.getElementById("phone");
 const nameInput = document.getElementById("name");
 
+document.addEventListener("DOMContentLoaded", () => {
 
+  // STAFF
+  document.querySelectorAll(".staff-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".staff-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      appState.staff = btn.dataset.staff;
+    });
+  });
+
+  // PAYMENT
+  document.querySelectorAll(".payment-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".payment-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      appState.payment = btn.dataset.mode;
+    });
+  });
+
+});
 /* =============================================================
    SECTION 3: PHONE INPUT — VALIDATION & AUTOCOMPLETE
    - Strips non-numeric characters as the user types
@@ -33,65 +58,121 @@ const nameInput = document.getElementById("name");
    - Clicking a suggestion auto-fills both phone and name fields
    ============================================================= */
 
-// Strip any non-digit characters from the phone field in real time
+   // -----------------------------
+// SECTION 3: PHONE INPUT + AUTOCOMPLETE (ENHANCED)
+// -----------------------------
+
+let selectedIndex = -1;
+let currentSuggestions = [];
+
+// Keep only digits in phone input
 phoneInput.addEventListener("input", () => {
   phoneInput.value = phoneInput.value.replace(/\D/g, "");
 });
 
-// Show autocomplete suggestions as the user types a phone number
+// Show autocomplete suggestions
 phoneInput.addEventListener("input", async () => {
   const phone = phoneInput.value;
   const box = document.getElementById("suggestionsBox");
 
-  // Don't show suggestions for very short input (< 2 digits)
   if (phone.length < 2) {
     box.style.display = "none";
     return;
   }
 
-  // Fetch all customers and filter by partial phone match
   const customers = await window.api.getCustomers("all");
-  const matches = customers.filter(c => c.phone.includes(phone));
+
+  currentSuggestions = customers.filter(c => c.phone.includes(phone));
+  selectedIndex = -1;
 
   box.innerHTML = "";
 
-  // Hide the dropdown if no matches found
-  if (matches.length === 0) {
+  if (currentSuggestions.length === 0) {
     box.style.display = "none";
     return;
   }
 
-  // Build a dropdown item for each matching customer
-  matches.forEach(c => {
+  renderSuggestions();
+});
+
+// Render suggestions (reusable)
+function renderSuggestions() {
+  const box = document.getElementById("suggestionsBox");
+  box.innerHTML = "";
+
+  currentSuggestions.forEach((c, index) => {
     const item = document.createElement("div");
 
     item.innerText = `${c.name} (${c.phone})`;
     item.style.padding = "6px";
     item.style.cursor = "pointer";
 
-    // Use mousedown (not click) so it fires before the input's blur event,
-    // preventing the dropdown from closing before selection is registered
-    item.onmousedown = () => {
-      phoneInput.value = c.phone;
-      nameInput.value = c.name;
+    // Highlight selected item
+    if (index === selectedIndex) {
+      item.style.background = "#333";
+      item.style.color = "#fff";
+    }
 
-      box.style.display = "none";
+    // Mouse select
+    item.onmousedown = () => selectCustomer(index);
 
-      // Trigger blur so last-visit info is fetched automatically
-      phoneInput.dispatchEvent(new Event("blur"));
+    // Hover effect
+    item.onmouseover = () => {
+      selectedIndex = index;
+      renderSuggestions();
     };
 
-    // Highlight row on hover
-    item.onmouseover = () => item.style.background = "#eee";
-    item.onmouseout = () => item.style.background = "white";
+    item.onmouseout = () => {
+      item.style.background = "";
+      item.style.color = "";
+    };
 
     box.appendChild(item);
   });
 
   box.style.display = "block";
+}
+
+// Select customer
+function selectCustomer(index) {
+  const c = currentSuggestions[index];
+  if (!c) return;
+
+  const box = document.getElementById("suggestionsBox");
+
+  phoneInput.value = c.phone;
+  nameInput.value = c.name;
+
+  box.style.display = "none";
+
+  phoneInput.dispatchEvent(new Event("blur"));
+}
+
+// Keyboard navigation
+phoneInput.addEventListener("keydown", (e) => {
+  if (!currentSuggestions.length) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    selectedIndex = (selectedIndex + 1) % currentSuggestions.length;
+    renderSuggestions();
+  }
+
+  if (e.key === "ArrowUp") {
+    e.preventDefault();
+    selectedIndex =
+      (selectedIndex - 1 + currentSuggestions.length) %
+      currentSuggestions.length;
+    renderSuggestions();
+  }
+
+  if (e.key === "Enter") {
+    e.preventDefault();
+    selectCustomer(selectedIndex);
+  }
 });
 
-// Close the suggestions dropdown when clicking anywhere outside the phone input
+// Close suggestions on outside click
 document.addEventListener("click", (e) => {
   const box = document.getElementById("suggestionsBox");
 
@@ -99,7 +180,6 @@ document.addEventListener("click", (e) => {
     box.style.display = "none";
   }
 });
-
 
 /* =============================================================
    SECTION 4: CUSTOMER AUTO-DETECTION ON PHONE BLUR
@@ -360,11 +440,14 @@ async function viewHistory() {
     const uniqueServices = [...new Set(servicesArr)];
     const formattedServices = uniqueServices.join(", ");
 
-    div.innerHTML = `
+   div.innerHTML = `
   <strong>${formattedServices}</strong>
   <span style="float:right;">₹${v.total}</span>
   <br>
-  <small style="color:gray;">${new Date(v.date).toLocaleDateString()}</small>
+  <small>
+    ${v.paymentMode || "N/A"} | ${v.staff || "N/A"} | 
+    ${new Date(v.date).toLocaleDateString()}
+  </small>
 `;
 
     box.appendChild(div);
@@ -580,8 +663,13 @@ async function saveVisit() {
   await window.api.saveCustomer({ name, phone });
 
   // Save the visit with services list and total
-  const res = await window.api.saveVisit({ phone, services, total });
-
+  const res = await window.api.saveVisit({
+  phone,
+  services,
+  total,
+   paymentMode: appState.payment || "UPI",
+  staff: appState.staff || "Senior"
+});
   if (res.success) {
     document.getElementById("status").innerText = "Saved successfully!";
 
@@ -751,7 +839,116 @@ async function downloadReport() {
   closeReportModal();
 }
 
+const adminPanel = document.getElementById("adminPanel");
 
+document.getElementById("adminBtn").onclick = () => {
+  adminPanel.classList.remove("hidden");
+  loadDashboard(); // load stats when opened
+};
+
+document.getElementById("closeAdmin").onclick = () => {
+  adminPanel.classList.add("hidden");
+};
+
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+
+    document.getElementById(btn.dataset.tab + "Tab").classList.remove("hidden");
+  });
+});
+
+let paymentChart;
+
+function renderPaymentChart(upi, cash) {
+  const ctx = document.getElementById("paymentChart");
+
+  if (paymentChart) {
+    paymentChart.destroy(); // avoid duplicate chart
+  }
+
+  paymentChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["UPI", "Cash"],
+      datasets: [{
+        label: "Amount ₹",
+        data: [upi, cash]
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+function renderStaffLeaderboard(stats) {
+  const container = document.getElementById("staffLeaderboard");
+  container.innerHTML = "";
+
+  const sorted = Object.entries(stats)
+    .filter(([name]) => name !== "Unknown")
+    .sort((a, b) => b[1] - a[1]);
+
+  sorted.forEach(([name, amount], index) => {
+    const row = document.createElement("div");
+
+    row.className = "staff-row";
+
+    row.innerHTML = `
+      <span class="rank">#${index + 1}</span>
+      <span class="name">${name}</span>
+      <span class="amount">₹${amount}</span>
+    `;
+
+    container.appendChild(row);
+  });
+}
+
+function animateValue(id, value) {
+  const el = document.getElementById(id);
+  const duration = 1200;
+  const startTime = performance.now();
+
+  const easeOut = t => 1 - Math.pow(1 - t, 3); // smooth finish
+
+  function update(currentTime) {
+    const raw = Math.min((currentTime - startTime) / duration, 1);
+    const progress = easeOut(raw);
+
+    const current = Math.floor(progress * value);
+    el.innerText = `₹${current}`;
+
+    if (raw < 1) {
+      requestAnimationFrame(update);
+    } else {
+      el.innerText = `₹${value}`;
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+async function loadDashboard() {
+  const data = await window.api.getDashboardStats();
+
+  console.log("Dashboard Data:", data);
+
+  // 👉 SET VALUES 
+  animateValue("dashToday", data.today);
+animateValue("dashWeek", data.week);
+animateValue("dashMonth", data.month);
+  // 👉 Chart
+  renderPaymentChart(data.upi, data.cash);
+
+  // 👉 Leaderboard
+  renderStaffLeaderboard(data.staffStats);
+}
 /* =============================================================
    SECTION 17: MODAL & KEYBOARD CONTROLS
    Global listeners for closing modals via Escape key or
@@ -759,11 +956,28 @@ async function downloadReport() {
    ============================================================= */
 
 // Close service modal when clicking the backdrop (outside modal content)
-window.addEventListener("click", (e) => {
-  const modal = document.getElementById("serviceModal");
+document.addEventListener("click", (e) => {
+  const box = document.getElementById("suggestionsBox");
 
-  if (e.target === modal) {
-    modal.classList.remove("open");
+  if (
+    !phoneInput.contains(e.target) &&
+    !box.contains(e.target)
+  ) {
+    box.style.display = "none";
+  }
+});
+
+
+
+document.getElementById("adminPanel").addEventListener("click", (e) => {
+  if (e.target.id === "adminPanel") {
+    e.currentTarget.classList.add("hidden");
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.getElementById("adminPanel").classList.add("hidden");
   }
 });
 

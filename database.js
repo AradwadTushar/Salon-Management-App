@@ -21,13 +21,26 @@ db.prepare(`
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS visits (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id INTEGER,
-    services TEXT,
-    total INTEGER,
-    date DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  customer_id INTEGER,
+  services TEXT,
+  total INTEGER,
+  payment_mode TEXT,
+  staff TEXT,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+)
 `).run();
+try {
+  db.prepare(`ALTER TABLE visits ADD COLUMN payment_mode TEXT`).run();
+} catch (e) {
+  // Column already exists → ignore
+}
+
+try {
+  db.prepare(`ALTER TABLE visits ADD COLUMN staff TEXT`).run();
+} catch (e) {
+  // Column already exists → ignore
+}
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS services (
