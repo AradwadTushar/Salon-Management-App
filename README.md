@@ -99,7 +99,7 @@ We hope to see you again! ✨
 ## ⚙️ How to Run
 
 ```bash
-git clone https://github.com/your-username/salon-management-app.git
+git clone https://github.com/AradwadTushar/Salon-Management-App
 cd salon-management-app
 npm install
 npm start
