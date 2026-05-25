@@ -999,3 +999,223 @@ loadIncome();      // Load today / week / month income figures
 loadServices();    // Render service buttons for billing
 loadServices();    // Called twice intentionally (safe, no side effects)
 loadServiceList(); // Render admin service list with edit/delete controls
+
+/* =============================================================
+   SECTION 19: MEN / WOMEN BILLING — GENDER + CATEGORY SYSTEM
+   Added on top of original code. All original functions intact.
+   ============================================================= */
+
+const genderState = {
+  gender:    'men',
+  hairLen:   'Shoulder',
+  activeCat: null,
+  bill:      [],   // [{id, name, price}]
+  billTotal: 0,
+  allSvcs:   [],
+};
+
+// ── Switch gender tab ─────────────────────────────────────────
+function switchGender(g, el) {
+  genderState.gender    = g;
+  genderState.activeCat = null;
+  genderState.bill      = [];
+  genderState.billTotal = 0;
+
+  document.querySelectorAll('.gender-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+
+  const wrap = document.getElementById('hairLenWrap');
+  if (g === 'women') wrap.classList.add('show');
+  else               wrap.classList.remove('show');
+
+  loadGenderServices();
+}
+
+// ── Hair length ───────────────────────────────────────────────
+function setHairLen(el) {
+  genderState.hairLen = el.dataset.len;
+  document.querySelectorAll('.hl-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderSvcGrid();
+}
+
+// ── Load services for current gender ─────────────────────────
+async function loadGenderServices() {
+  const all = await window.api.getServicesByGender(genderState.gender);
+  genderState.allSvcs = all;
+
+  // Also rebuild serviceMap so repeatLastVisit() still works
+  all.forEach(s => { serviceMap[s.name] = s.price; });
+
+  renderCatTabs();
+  renderSvcGrid();
+}
+
+// ── Category tabs ─────────────────────────────────────────────
+function renderCatTabs() {
+  const cats = [...new Set(genderState.allSvcs.map(s => s.category || 'General'))];
+  if (!genderState.activeCat || !cats.includes(genderState.activeCat)) {
+    genderState.activeCat = cats[0] || null;
+  }
+  const wrap = document.getElementById('catTabs');
+  wrap.innerHTML = cats.map(c =>
+    `<button class="cat-tab${c === genderState.activeCat ? ' active' : ''}"
+       onclick="pickCat('${c.replace(/'/g,"\\'")}',this)">${c}</button>`
+  ).join('');
+}
+
+function pickCat(cat, el) {
+  genderState.activeCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderSvcGrid();
+}
+
+// ── Service grid ──────────────────────────────────────────────
+function renderSvcGrid() {
+  let svcs = genderState.allSvcs.filter(s =>
+    (s.category || 'General') === genderState.activeCat
+  );
+
+  // For women: filter by hair length when variants exist
+  if (genderState.gender === 'women') {
+    const hasLenVariants = svcs.some(s =>
+      s.name.includes('Shoulder') || s.name.includes('Mid-Back') || s.name.includes('Waist')
+    );
+    if (hasLenVariants) {
+      const lenKey = genderState.hairLen;
+      svcs = svcs.filter(s =>
+        (!s.name.includes('Shoulder') && !s.name.includes('Mid-Back') && !s.name.includes('Waist'))
+        || s.name.includes(lenKey)
+      );
+    }
+  }
+
+  const grid = document.getElementById('svcGrid');
+  if (!svcs.length) {
+    grid.innerHTML = '<div style="color:var(--text-dim);font-size:12px;text-align:center;padding:20px 0;grid-column:1/-1;">No services in this category</div>';
+    return;
+  }
+
+  function cleanName(n) {
+    return n
+      .replace(/^\[.\]\s*/, '')
+      .replace(/\s*\((Shoulder|Mid-Back|Waist.*?)\)\s*$/, '');
+  }
+
+  grid.innerHTML = svcs.map(s => {
+    const sel = genderState.bill.some(b => b.id === s.id);
+    return `<button class="svc-btn${sel ? ' selected' : ''}"
+      onclick="toggleSvcBtn(${s.id},'${s.name.replace(/'/g,"\\'")}',${s.price})">
+      <span class="svc-check">✓</span>
+      ${cleanName(s.name)}
+      <span class="svc-price">₹${s.price.toLocaleString('en-IN')}</span>
+    </button>`;
+  }).join('');
+}
+
+// ── Toggle service in/out of bill ─────────────────────────────
+function toggleSvcBtn(id, name, price) {
+  const idx = genderState.bill.findIndex(b => b.id === id);
+  if (idx > -1) {
+    genderState.billTotal -= genderState.bill[idx].price;
+    genderState.bill.splice(idx, 1);
+    // also remove from legacy services array
+    const li = services.indexOf(name);
+    if (li > -1) { services.splice(li, 1); total -= price; }
+  } else {
+    genderState.bill.push({ id, name, price });
+    genderState.billTotal += price;
+    // also add to legacy services array so saveVisit() picks it up
+    services.push(name);
+    total += price;
+  }
+  // Update the legacy total display
+  document.getElementById('total').innerText = total;
+  renderSvcGrid();
+}
+
+// ── Admin: add service with gender+category ───────────────────
+// Overrides the inline addAdminService() in index.html
+async function addAdminService() {
+  const name     = document.getElementById('adminServiceName').value.trim();
+  const price    = document.getElementById('adminServicePrice').value.trim();
+  const gender   = document.getElementById('adminServiceGender')?.value || 'men';
+  const category = document.getElementById('adminServiceCat')?.value.trim() || 'General';
+
+  if (!name || !price) { showStatus('Enter service name and price'); return; }
+
+  await window.api.addService({ name, price: parseInt(price), gender, category });
+
+  document.getElementById('adminServiceName').value  = '';
+  document.getElementById('adminServicePrice').value = '';
+  if (document.getElementById('adminServiceCat'))
+    document.getElementById('adminServiceCat').value = '';
+
+  loadAdminServiceList();
+  loadGenderServices();
+  loadServices(); // refresh legacy chips too
+}
+
+// ── Admin: service list with gender+category badges ───────────
+let _allAdminSvcs = [];
+
+async function loadAdminServiceList() {
+  if (!window.api) return;
+  _allAdminSvcs = await window.api.getServices();
+  renderAdminSvcList(_allAdminSvcs);
+}
+
+function renderAdminSvcList(svcs) {
+  const container = document.getElementById('adminServiceList');
+  container.innerHTML = '';
+  svcs.forEach(s => {
+    const row = document.createElement('div');
+    row.innerHTML = `
+      <span class="svc-badge ${s.gender || 'men'}">${s.gender === 'women' ? 'W' : 'M'}</span>
+      <span class="svc-badge cat">${s.category || 'General'}</span>
+      <span style="flex:1;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</span>
+      <span style="font-size:11px;color:var(--text-dim);margin-right:4px;">₹</span>
+      <input type="number" value="${s.price}" id="adminPrice-${s.id}"
+        style="width:70px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:12px;outline:none;"
+        onkeypress="if(event.key==='Enter') syncAndUpdate(${s.id})"
+      />
+      <button class="btn btn-secondary" style="padding:5px 10px;font-size:11px;margin-left:6px;"
+        onclick="syncAndUpdate(${s.id})">Update</button>
+      <button class="btn btn-danger" style="padding:5px 10px;font-size:11px;margin-left:4px;"
+        onclick="deleteServiceAndRefresh(${s.id})">Delete</button>
+    `;
+    container.appendChild(row);
+  });
+  if (!svcs.length) {
+    container.innerHTML = '<div style="color:var(--text-dim);font-size:12px;text-align:center;padding:20px;">No services found</div>';
+  }
+}
+
+function filterAdminSvcList() {
+  const q = (document.getElementById('adminSvcSearch')?.value || '').toLowerCase();
+  const g = document.getElementById('adminSvcGenderFilter')?.value || 'all';
+  const filtered = _allAdminSvcs.filter(s => {
+    const matchG = g === 'all' || s.gender === g;
+    const matchQ = !q || s.name.toLowerCase().includes(q) || (s.category || '').toLowerCase().includes(q);
+    return matchG && matchQ;
+  });
+  renderAdminSvcList(filtered);
+}
+
+function syncAndUpdate(id) {
+  const adminVal = document.getElementById('adminPrice-' + id);
+  const origEl   = document.getElementById('price-' + id);
+  if (origEl && adminVal) origEl.value = adminVal.value;
+  updateServicePrice(id);
+  setTimeout(() => { loadAdminServiceList(); loadGenderServices(); }, 300);
+}
+
+async function deleteServiceAndRefresh(id) {
+  await deleteService(id);
+  loadAdminServiceList();
+  loadGenderServices();
+}
+
+// ── Boot the new system ───────────────────────────────────────
+loadGenderServices();

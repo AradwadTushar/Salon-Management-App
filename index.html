@@ -963,6 +963,112 @@
   margin-bottom: 0;
 }
 
+
+    /* ═══════════════════════════════════════
+       GENDER TABS (Men / Women)
+    ═══════════════════════════════════════ */
+    .gender-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin: -18px -18px 16px -18px;
+    }
+    .gender-tab {
+      flex: 1; padding: 10px; text-align: center;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; background: none;
+      color: var(--text-muted); border-bottom: 2px solid transparent;
+      font-family: 'DM Sans', sans-serif;
+      transition: all var(--tr);
+    }
+    .gender-tab:hover { color: var(--text); }
+    .gender-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* ═══════════════════════════════════════
+       HAIR LENGTH SELECTOR (Women)
+    ═══════════════════════════════════════ */
+    .hair-len-wrap { display: none; margin-bottom: 12px; }
+    .hair-len-wrap.show { display: block; }
+    .hair-len-btns { display: flex; gap: 5px; }
+    .hl-btn {
+      flex: 1; padding: 6px 4px; border-radius: var(--radius-xs);
+      border: 1px solid var(--border); background: var(--bg-elevated);
+      color: var(--text-muted); font-family: 'DM Sans', sans-serif;
+      font-size: 11px; cursor: pointer; text-align: center;
+      transition: all var(--tr);
+    }
+    .hl-btn:hover { border-color: var(--accent-border); color: var(--accent); }
+    .hl-btn.active {
+      border-color: var(--accent); background: var(--accent-dim);
+      color: var(--accent); font-weight: 600;
+    }
+
+    /* ═══════════════════════════════════════
+       CATEGORY TABS
+    ═══════════════════════════════════════ */
+    .cat-tabs-wrap { margin-bottom: 10px; }
+    .cat-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+    .cat-tab {
+      padding: 4px 10px; border-radius: 20px; font-size: 11px;
+      cursor: pointer; border: 1px solid var(--border);
+      background: none; color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif; transition: all var(--tr);
+    }
+    .cat-tab:hover { border-color: var(--accent-border); color: var(--accent); }
+    .cat-tab.active {
+      background: var(--accent); color: var(--accent-text);
+      border-color: var(--accent); font-weight: 600;
+    }
+
+    /* ═══════════════════════════════════════
+       SERVICE GRID (replaces flat chip list)
+    ═══════════════════════════════════════ */
+    .svc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .svc-btn {
+      padding: 8px 10px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg-elevated);
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; cursor: pointer; text-align: left;
+      transition: all var(--tr); position: relative;
+    }
+    .svc-btn:hover {
+      border-color: var(--accent-border); color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .svc-btn.selected {
+      background: var(--accent-dim);
+      border-color: var(--accent); color: var(--accent);
+    }
+    .svc-btn .svc-price {
+      font-size: 11px; color: var(--text-muted);
+      display: block; margin-top: 2px;
+    }
+    .svc-btn.selected .svc-price { color: var(--accent); }
+    .svc-btn .svc-check {
+      position: absolute; top: 5px; right: 7px;
+      font-size: 11px; opacity: 0;
+    }
+    .svc-btn.selected .svc-check { opacity: 1; }
+
+    /* Admin gender/category badges */
+    .svc-badge {
+      font-size: 9px; padding: 2px 7px; border-radius: 20px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+      display: inline-block; margin-right: 4px;
+    }
+    .svc-badge.men   { background:rgba(74,144,217,.15); color:#74B0F0; border:1px solid rgba(74,144,217,.25); }
+    .svc-badge.women { background:rgba(201,82,106,.15); color:#E07A90; border:1px solid rgba(201,82,106,.25); }
+    .svc-badge.cat   { background:var(--accent-dim); color:var(--accent); border:1px solid var(--accent-border); }
+
   </style>
 </head>
 <body>
@@ -1089,8 +1195,32 @@
 
         <div class="sep"></div>
 
-        <div class="field-label" style="margin-bottom:8px;">Select Services</div>
-        <div id="servicesContainer"></div>
+        <!-- ══ GENDER TABS ══ -->
+        <div class="gender-tabs">
+          <button class="gender-tab active" data-g="men"   onclick="switchGender('men',this)">✂ Men</button>
+          <button class="gender-tab"        data-g="women" onclick="switchGender('women',this)">✨ Women</button>
+        </div>
+
+        <!-- ══ HAIR LENGTH (women only) ══ -->
+        <div class="hair-len-wrap" id="hairLenWrap">
+          <div class="field-label" style="margin-bottom:6px;">Hair Length</div>
+          <div class="hair-len-btns">
+            <button class="hl-btn active" data-len="Shoulder" onclick="setHairLen(this)">Shoulder</button>
+            <button class="hl-btn" data-len="Mid-Back"        onclick="setHairLen(this)">Mid-back</button>
+            <button class="hl-btn" data-len="Waist"           onclick="setHairLen(this)">Waist &amp; below</button>
+          </div>
+        </div>
+
+        <!-- ══ CATEGORY TABS ══ -->
+        <div class="cat-tabs-wrap">
+          <div class="cat-tabs" id="catTabs"></div>
+        </div>
+
+        <!-- ══ SERVICE GRID ══ -->
+        <div class="svc-grid" id="svcGrid"></div>
+
+        <!-- keep servicesContainer hidden for legacy compat with renderer.js addService() -->
+        <div id="servicesContainer" style="display:none;"></div>
 
         <div class="total-row">
           <span class="tr-label">Total Amount</span>
@@ -1210,8 +1340,8 @@
 
         <!-- ── SERVICES TAB ── -->
         <div class="tab-pane" id="servicesTab">
-          <div class="svc-add-row">
-            <div class="field">
+          <div class="svc-add-row" style="flex-wrap:wrap;">
+            <div class="field" style="min-width:140px;">
               <span class="field-label">Service Name</span>
               <input id="adminServiceName" placeholder="e.g. Haircut, Facial…" />
             </div>
@@ -1219,7 +1349,24 @@
               <span class="field-label">Price ₹</span>
               <input id="adminServicePrice" type="number" placeholder="0" />
             </div>
+            <div class="field" style="max-width:90px;flex:none;">
+              <span class="field-label">Gender</span>
+              <select id="adminServiceGender">
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+              </select>
+            </div>
+            <div class="field" style="max-width:110px;flex:none;">
+              <span class="field-label">Category</span>
+              <input id="adminServiceCat" placeholder="e.g. Haircut" />
+            </div>
             <button class="btn btn-primary" style="align-self:flex-end;height:38px;padding:0 18px;" onclick="addAdminService()">+ Add</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <input type="text" id="adminSvcSearch" placeholder="Search services…" oninput="filterAdminSvcList()" style="flex:1;" />
+            <select id="adminSvcGenderFilter" onchange="filterAdminSvcList()" style="width:90px;">
+              <option value="all">All</option><option value="men">Men</option><option value="women">Women</option>
+            </select>
           </div>
           <div id="adminServiceList"></div>
         </div>

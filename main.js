@@ -4,7 +4,14 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const db = require('./database');
+const { getDb } = require('./database');
+
+// Lazy proxy — getDb() only called after app is ready
+const db = new Proxy({}, {
+  get(_, prop) {
+    return getDb()[prop];
+  }
+});
 
 ipcMain.handle("get-dashboard-stats", () => {
   const today = new Date().toISOString().slice(0, 10);
@@ -284,7 +291,7 @@ ipcMain.handle('backup-data', async () => {
   if (result.canceled) return { success: false };
 
   try {
-    const dbPath = path.join(__dirname, 'salon.db');
+    const dbPath = path.join(app.getPath('userData'), 'salon.db');
     fs.copyFileSync(dbPath, result.filePath);
 
     return { success: true };
@@ -304,7 +311,7 @@ ipcMain.handle('restore-data', async () => {
   if (result.canceled) return { success: false };
 
   try {
-    const dbPath = path.join(__dirname, 'salon.db');
+    const dbPath = path.join(app.getPath('userData'), 'salon.db');
     fs.copyFileSync(result.filePaths[0], dbPath);
 
     return { success: true };
@@ -469,4 +476,13 @@ ipcMain.handle('top-customers', () => {
     ORDER BY visits DESC
     LIMIT 5
   `).all();
+});
+
+// ======================
+// 🆕 SERVICES BY GENDER (new — for Men/Women billing UI)
+// ======================
+ipcMain.handle('get-services-by-gender', (event, gender) => {
+  return db.prepare(`
+    SELECT * FROM services WHERE gender = ? ORDER BY category, name
+  `).all(gender);
 });
