@@ -142,6 +142,7 @@ function selectCustomer(index) {
 
   phoneInput.value = c.phone;
   nameInput.value = c.name;
+  clearCart();
 
   box.style.display = "none";
 
@@ -277,8 +278,12 @@ https://maps.app.goo.gl/8kTAqnhdbhQsWP6x7`;
 // Add a service to the current billing session
 function addService(name, price) {
   services.push(name);
+
   total += price;
+
   document.getElementById("total").innerText = total;
+
+  renderCart();
 }
 
 
@@ -418,36 +423,101 @@ async function deleteService(id) {
 
 // Load and display all visits for the current customer
 async function viewHistory() {
+
   const phone = phoneInput.value;
 
-  if (!phone) return;
+  if (!phone) {
 
-  const visits = await window.api.getVisitHistory(phone);
+  showStatus(
+    "Enter customer phone first"
+  );
 
-  const box = document.getElementById("historyBox");
+  return;
+}
+
+  const visits =
+    await window.api.getVisitHistory(phone);
+
+  const box = document.querySelector(
+    ".svc-scroll #historyBox"
+  );
+
+  box.style.display = "flex";
+
   box.innerHTML = "<h4>Visit History</h4>";
 
   if (visits.length === 0) {
-    box.innerHTML += "<p style='color:gray'>No history found</p>";
+
+    box.innerHTML += `
+      <p style='color:gray'>
+        No history found
+      </p>
+    `;
+
     return;
   }
 
   visits.forEach(v => {
+
     const div = document.createElement("div");
 
-    // Split comma-separated services, remove duplicates, then display cleanly
     const servicesArr = v.services.split(",");
-    const uniqueServices = [...new Set(servicesArr)];
-    const formattedServices = uniqueServices.join(", ");
 
-   div.innerHTML = `
-  <strong>${formattedServices}</strong>
-  <span style="float:right;">₹${v.total}</span>
-  <br>
-  <small>
-    ${v.paymentMode || "N/A"} | ${v.staff || "N/A"} | 
-    ${new Date(v.date).toLocaleDateString()}
-  </small>
+    const uniqueServices =
+      [...new Set(servicesArr)];
+
+    const formattedServices =
+  uniqueServices
+    .map(s =>
+      s
+        .replace(/^\[.\]\s*/, "")
+    )
+    .join(" • ");
+
+    div.innerHTML = `
+
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+  ">
+
+    <div>
+
+      <div style="
+        font-size:13px;
+        font-weight:600;
+        color:var(--txt);
+        line-height:1.5;
+      ">
+        ${formattedServices}
+      </div>
+
+      <div style="
+        margin-top:6px;
+        font-size:11px;
+        color:var(--txt-muted);
+      ">
+        ${v.paymentMode || "N/A"}
+        •
+        ${v.staff || "N/A"}
+        •
+        ${new Date(v.date).toLocaleDateString()}
+      </div>
+
+    </div>
+
+    <div style="
+      font-weight:700;
+      color:var(--acc);
+      white-space:nowrap;
+      font-size:14px;
+    ">
+      ₹${v.total}
+    </div>
+
+  </div>
 `;
 
     box.appendChild(div);
@@ -524,6 +594,8 @@ async function repeatLastVisit() {
   el.innerText = `Last Visit: ${visit.services} | ₹${visit.total} (reused)`;
 
   document.getElementById("status").innerText = "Loaded last visit!";
+  renderCart();
+renderSvcGrid();
 }
 
 
@@ -699,6 +771,7 @@ async function saveVisit() {
       phoneInput.focus();
     }, 100);
   }
+  clearCart();
 }
 
 
@@ -1116,23 +1189,48 @@ function renderSvcGrid() {
 
 // ── Toggle service in/out of bill ─────────────────────────────
 function toggleSvcBtn(id, name, price) {
-  const idx = genderState.bill.findIndex(b => b.id === id);
+
+  const idx =
+    genderState.bill.findIndex(
+      b => b.id === id
+    );
+
+  // REMOVE
   if (idx > -1) {
-    genderState.billTotal -= genderState.bill[idx].price;
+
+    genderState.billTotal -=
+      genderState.bill[idx].price;
+
     genderState.bill.splice(idx, 1);
-    // also remove from legacy services array
-    const li = services.indexOf(name);
-    if (li > -1) { services.splice(li, 1); total -= price; }
-  } else {
-    genderState.bill.push({ id, name, price });
-    genderState.billTotal += price;
-    // also add to legacy services array so saveVisit() picks it up
-    services.push(name);
-    total += price;
+
   }
-  // Update the legacy total display
-  document.getElementById('total').innerText = total;
+
+  // ADD
+  else {
+
+    genderState.bill.push({
+      id,
+      name,
+      price
+    });
+
+    genderState.billTotal += price;
+  }
+
+  // legacy sync
+  services =
+    genderState.bill.map(b => b.name);
+
+  total =
+    genderState.billTotal;
+
+  // UI updates
+  document.getElementById("total").innerText =
+    total;
+
   renderSvcGrid();
+
+  renderCart();
 }
 
 // ── Admin: add service with gender+category ───────────────────
@@ -1216,6 +1314,253 @@ async function deleteServiceAndRefresh(id) {
   loadAdminServiceList();
   loadGenderServices();
 }
+
+function renderCart() {
+
+  const cart =
+    document.getElementById("cartItemsList");
+
+  if (!cart) return;
+
+  // EMPTY CART
+  if (services.length === 0) {
+
+    cart.innerHTML = `
+      <div class="cart-empty">
+        <span class="material-symbols-outlined">
+          receipt_long
+        </span>
+
+        <span>
+          Select services to add
+        </span>
+      </div>
+    `;
+
+    document.getElementById("cartCount")
+      .innerText = "0 services";
+
+    document.getElementById("total")
+      .innerText = 0;
+
+    return;
+  }
+
+  // CLEAR OLD ITEMS
+  cart.innerHTML = "";
+
+  // BUILD ITEMS
+  services.forEach((serviceName, index) => {
+
+    const price =
+      serviceMap[serviceName] || 0;
+
+    const item = document.createElement("div");
+
+    item.className = "cart-item";
+
+    item.innerHTML = `
+
+      <div class="cart-item-name">
+        ${serviceName}
+      </div>
+
+      <div class="cart-item-price mono">
+        ₹${price.toLocaleString('en-IN')}
+      </div>
+
+      <button
+        class="cart-item-del"
+        onclick="removeService(${index})">
+
+        <span class="material-symbols-outlined">
+          close
+        </span>
+
+      </button>
+    `;
+
+    cart.appendChild(item);
+  });
+
+  document.getElementById("cartCount")
+    .innerText =
+      services.length +
+      (services.length === 1
+        ? " service"
+        : " services");
+
+  document.getElementById("total")
+    .innerText = total;
+}
+
+function removeService(index) {
+
+  const serviceName = services[index];
+
+  total -= serviceMap[serviceName] || 0;
+
+  if (total < 0) total = 0;
+
+  services.splice(index, 1);
+
+  // sync gender system
+  genderState.bill =
+    genderState.bill.filter(
+      b => b.name !== serviceName
+    );
+
+  genderState.billTotal = total;
+
+  document.getElementById("total")
+    .innerText = total;
+
+  renderCart();
+
+  renderSvcGrid();
+}
+function clearCart() {
+
+  services = [];
+
+  total = 0;
+
+  genderState.bill = [];
+
+  genderState.billTotal = 0;
+
+  document.getElementById("total")
+    .innerText = 0;
+
+  renderCart();
+
+  renderSvcGrid();
+
+  showStatus("Cart cleared");
+}
+
+let focusedServiceIndex = 0;
+
+document.addEventListener(
+  "keydown",
+  handleKeyboardNavigation
+);
+
+function handleKeyboardNavigation(e) {
+
+  const tiles =
+    [...document.querySelectorAll(".svc-btn")];
+
+  if (!tiles.length) return;
+
+  // RIGHT
+  if (e.key === "ArrowRight") {
+
+    focusedServiceIndex =
+      Math.min(
+        focusedServiceIndex + 1,
+        tiles.length - 1
+      );
+
+    updateFocusedTile();
+  }
+
+  // LEFT
+  if (e.key === "ArrowLeft") {
+
+    focusedServiceIndex =
+      Math.max(
+        focusedServiceIndex - 1,
+        0
+      );
+
+    updateFocusedTile();
+  }
+
+  // DOWN
+  if (e.key === "ArrowDown") {
+
+    focusedServiceIndex =
+      Math.min(
+        focusedServiceIndex + 4,
+        tiles.length - 1
+      );
+
+    updateFocusedTile();
+  }
+
+  // UP
+  if (e.key === "ArrowUp") {
+
+    focusedServiceIndex =
+      Math.max(
+        focusedServiceIndex - 4,
+        0
+      );
+
+    updateFocusedTile();
+  }
+
+  // ENTER
+  if (e.key === "Enter") {
+
+    tiles[focusedServiceIndex]?.click();
+  }
+
+  // CTRL + S
+  if (e.ctrlKey && e.key.toLowerCase() === "s") {
+
+    e.preventDefault();
+
+    saveVisit();
+  }
+
+  // CTRL + BACKSPACE
+  if (
+    e.ctrlKey &&
+    e.key === "Backspace"
+  ) {
+
+    e.preventDefault();
+
+    clearCart();
+  }
+
+  // CTRL + H
+  if (
+    e.ctrlKey &&
+    e.key.toLowerCase() === "h"
+  ) {
+
+    e.preventDefault();
+
+    viewHistory();
+  }
+}
+
+function updateFocusedTile() {
+
+  const tiles =
+    [...document.querySelectorAll(".svc-btn")];
+
+  tiles.forEach(
+    t => t.classList.remove("kbd-focus")
+  );
+
+  const active =
+    tiles[focusedServiceIndex];
+
+  if (!active) return;
+
+  active.classList.add("kbd-focus");
+
+  active.scrollIntoView({
+    block: "nearest",
+    inline: "nearest"
+  });
+}
+
+
 
 // ── Boot the new system ───────────────────────────────────────
 loadGenderServices();

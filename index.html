@@ -1,1608 +1,2598 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="gold">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Salon App</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    /* ═══════════════════════════════════════
-       DESIGN TOKENS — THEME SYSTEM
-       Swap data-theme on <html> to change accent
-    ═══════════════════════════════════════ */
-    :root,
-    [data-theme="gold"] {
-      --accent:         #C9A84C;
-      --accent-light:   #E2C97E;
-      --accent-dim:     rgba(201,168,76,0.12);
-      --accent-border:  rgba(201,168,76,0.28);
-      --accent-glow:    rgba(201,168,76,0.18);
-      --accent-text:    #0D0D0D;
-    }
-    [data-theme="steel"] {
-      --accent:         #4A90D9;
-      --accent-light:   #74B0F0;
-      --accent-dim:     rgba(74,144,217,0.12);
-      --accent-border:  rgba(74,144,217,0.28);
-      --accent-glow:    rgba(74,144,217,0.18);
-      --accent-text:    #fff;
-    }
-    [data-theme="emerald"] {
-      --accent:         #3DAA72;
-      --accent-light:   #5ECE94;
-      --accent-dim:     rgba(61,170,114,0.12);
-      --accent-border:  rgba(61,170,114,0.28);
-      --accent-glow:    rgba(61,170,114,0.18);
-      --accent-text:    #fff;
-    }
-    [data-theme="rose"] {
-      --accent:         #C9526A;
-      --accent-light:   #E07A90;
-      --accent-dim:     rgba(201,82,106,0.12);
-      --accent-border:  rgba(201,82,106,0.28);
-      --accent-glow:    rgba(201,82,106,0.18);
-      --accent-text:    #fff;
-    }
+<!doctype html>
+<html lang="en" data-theme="gold" data-mode="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IronStar POS</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ═══════════════════════════════════════
+   ACCENT THEMES
+═══════════════════════════════════════ */
 
-    :root {
-      --bg:           #0D0D0D;
-      --bg-card:      #141414;
-      --bg-elevated:  #1C1C1C;
-      --bg-input:     #181818;
-      --text:         #F0EDE6;
-      --text-muted:   #8A8070;
-      --text-dim:     #5A5550;
-      --border:       #252220;
-      --border-hover: #3A3530;
-      --success:      #4CAF82;
-      --danger:       #C94C4C;
-      --whatsapp:     #25D366;
-      --radius:       12px;
-      --radius-sm:    8px;
-      --radius-xs:    6px;
-      --shadow:       0 8px 32px rgba(0,0,0,0.5);
-      --shadow-sm:    0 2px 12px rgba(0,0,0,0.35);
-      --tr:           0.18s cubic-bezier(0.4,0,0.2,1);
-    }
+      :root,
+      [data-theme="gold"] {
+        --acc: #c9a84c;
+        --acc-light: #e2c97e;
+        --acc-dim: rgba(201, 168, 76, 0.1);
+        --acc-border: rgba(201, 168, 76, 0.3);
+        --acc-text: #0d0d0d;
+      }
 
-    /* ── RESET ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height: 100%; }
-    body {
-      font-family: 'DM Sans', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      font-size: 14px;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
+      [data-theme="teal"] {
+        --acc: #0d9488;
+        --acc-light: #2dd4bf;
+        --acc-dim: rgba(13, 148, 136, 0.1);
+        --acc-border: rgba(13, 148, 136, 0.3);
+        --acc-text: #fff;
+      }
 
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--accent-border); }
-    
+      [data-theme="indigo"] {
+        --acc: #6366f1;
+        --acc-light: #818cf8;
+        --acc-dim: rgba(99, 102, 241, 0.1);
+        --acc-border: rgba(99, 102, 241, 0.3);
+        --acc-text: #fff;
+      }
 
-    /* ══════════════════════════════════════════
-       TOPBAR
+      [data-theme="rose"] {
+        --acc: #f43f5e;
+        --acc-light: #fb7185;
+        --acc-dim: rgba(244, 63, 94, 0.1);
+        --acc-border: rgba(244, 63, 94, 0.3);
+        --acc-text: #fff;
+      }
+
+      /* ═══════════════════════════════════════
+   UI MODES
+═══════════════════════════════════════ */
+
+      /* DARK MODE */
+      :root,
+      [data-mode="dark"] {
+        --bg: #0c0e10;
+
+        --bg-card: #131619;
+
+        --bg-elevated: #1a1e22;
+
+        --bg-input: #161a1e;
+
+        --txt: #e8ecf0;
+
+        --txt-muted: #7a8290;
+
+        --txt-dim: #444c56;
+
+        --border: #1f2428;
+
+        --border-hi: #2a3038;
+
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      }
+
+      /* LIGHT MODE */
+      [data-mode="light"] {
+        --bg: #f4f6f9;
+
+        --bg-card: #ffffff;
+
+        --bg-elevated: #eef2f7;
+
+        --bg-input: #ffffff;
+
+        --txt: #111827;
+
+        --txt-muted: #6b7280;
+
+        --txt-dim: #9ca3af;
+
+        --border: #d8e0ea;
+
+        --border-hi: #c7d1dd;
+
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      }
+
+      /* ═══════════════════════════════════════
+   GLOBAL TOKENS
+═══════════════════════════════════════ */
+
+      :root {
+        --success: #22c55e;
+
+        --danger: #ef4444;
+
+        --whatsapp: #25d366;
+
+        --r: 8px;
+
+        --r-sm: 6px;
+
+        --r-xs: 4px;
+
+        --tr: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--txt);
+        font-size: 13px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      .mono {
+        font-family: "DM Mono", monospace;
+      }
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-hi);
+        border-radius: 4px;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 20;
+        font-size: 18px;
+        line-height: 1;
+        vertical-align: middle;
+        user-select: none;
+      }
+
+      input,
+      select,
+      textarea {
+        background: var(--bg-input) !important;
+
+        color: var(--txt) !important;
+
+        border: 1px solid var(--border) !important;
+      }
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--txt);
+
+        -webkit-box-shadow: 0 0 0px 1000px var(--bg-input) inset;
+
+        transition: background-color 9999s ease-in-out 0s;
+      }
+
+      .kbd-focus {
+        outline: 2px solid var(--acc-light);
+
+        outline-offset: 2px;
+
+        transform: translateY(-1px);
+
+        box-shadow: 0 0 0 4px var(--acc-dim);
+      }
+      /* ══════════════════════════════════════════
+       APP SHELL — FIXED LAYOUT
     ══════════════════════════════════════════ */
-    .topbar {
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky; top: 0; z-index: 90;
-      -webkit-app-region: drag;
-    }
-    .topbar > * { -webkit-app-region: no-drag; }
+      .app-shell {
+        display: grid;
+        grid-template-rows: 52px 1fr;
+        grid-template-columns: 1fr 340px;
+        height: 100vh;
+      }
 
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-mark {
-      width: 34px; height: 34px;
-      border-radius: 8px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .brand-mark img { width: 100%; height: 100%; object-fit: cover; }
-    .brand-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 21px; font-weight: 600; color: var(--text);
-      letter-spacing: 0.02em;
-    }
-    .brand-name span { color: var(--accent); transition: color var(--tr); }
+      /* ── TOPBAR ── */
+      .topbar {
+        grid-column: 1 / -1;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 12px;
+        -webkit-app-region: drag;
+      }
+      .topbar > * {
+        -webkit-app-region: no-drag;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--txt);
+        letter-spacing: -0.01em;
+        flex-shrink: 0;
+      }
+      .brand-dot {
+        color: var(--acc);
+        transition: color var(--tr);
+      }
+      .brand-logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .brand-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
 
-    .topbar-right { display: flex; align-items: center; gap: 8px; }
+      /* Income pills in topbar */
+      .topbar-income {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 8px;
+      }
+      .inc-pill {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-size: 11px;
+        cursor: default;
+        transition: border-color var(--tr);
+      }
+      .inc-pill:hover {
+        border-color: var(--acc-border);
+      }
+      .inc-label {
+        color: var(--txt-dim);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+      .inc-val {
+        color: var(--acc);
+        font-weight: 600;
+        transition: color var(--tr);
+      }
+      .inc-sep {
+        width: 1px;
+        height: 14px;
+        background: var(--border);
+      }
 
-    /* THEME DOTS */
-    .theme-dots { display: flex; align-items: center; gap: 6px; margin-right: 6px; }
-    .theme-dot {
-      width: 14px; height: 14px; border-radius: 50%; cursor: pointer;
-      border: 2px solid transparent;
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-      position: relative;
-    }
-    .theme-dot:hover { transform: scale(1.25); }
-    .theme-dot.active {
-      border-color: var(--text);
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
-    }
-    .theme-dot[data-t="gold"]    { background: #C9A84C; }
-    .theme-dot[data-t="steel"]   { background: #4A90D9; }
-    .theme-dot[data-t="emerald"] { background: #3DAA72; }
-    .theme-dot[data-t="rose"]    { background: #C9526A; }
+      .topbar-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .theme-dots {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .theme-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.18s;
+      }
+      .theme-dot:hover {
+        transform: scale(1.3);
+      }
+      .theme-dot.active {
+        border-color: var(--txt);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+      }
+      .theme-dot[data-t="gold"] {
+        background: #c9a84c;
+      }
+      .theme-dot[data-t="teal"] {
+        background: #0d9488;
+      }
+      .theme-dot[data-t="indigo"] {
+        background: #6366f1;
+      }
+      .theme-dot[data-t="rose"] {
+        background: #f43f5e;
+      }
 
-    .badge-pro {
-      background: var(--accent-dim); border: 1px solid var(--accent-border);
-      color: var(--accent); font-size: 9px; font-weight: 700;
-      letter-spacing: 0.12em; padding: 2px 8px; border-radius: 20px;
-      text-transform: uppercase;
-      transition: background var(--tr), border-color var(--tr), color var(--tr);
-    }
+      /* ── BUTTONS ── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 7px 14px;
+        border-radius: var(--r-sm);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all var(--tr);
+        white-space: nowrap;
+        user-select: none;
+      }
+      .btn:active {
+        transform: scale(0.96);
+      }
+      .btn-primary {
+        background: var(--acc);
+        color: var(--acc-text);
+        font-weight: 700;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+      }
+      .btn-primary:hover {
+        filter: brightness(1.1);
+      }
+      .btn-secondary {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        color: var(--txt-muted);
+      }
+      .btn-secondary:hover {
+        border-color: var(--acc-border);
+        color: var(--acc);
+        background: var(--acc-dim);
+      }
+      .btn-ghost {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--txt-muted);
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      .btn-ghost:hover {
+        border-color: var(--acc-border);
+        color: var(--acc);
+        background: var(--acc-dim);
+      }
+      .btn-danger {
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        color: var(--danger);
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+      .btn-danger:hover {
+        background: rgba(239, 68, 68, 0.15);
+      }
+      .btn-icon {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--txt-muted);
+        padding: 5px 8px;
+        border-radius: var(--r-sm);
+      }
+      .btn-icon:hover {
+        border-color: var(--acc-border);
+        color: var(--acc);
+      }
 
-    /* ══════════════════════════════════════════
-       BUTTONS — GLOBAL
+      /* ══════════════════════════════════════════
+       LEFT PANEL — SERVICE SELECTION
     ══════════════════════════════════════════ */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 9px 16px;
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-      cursor: pointer; border: none;
-      transition: all var(--tr);
-      white-space: nowrap; user-select: none;
-      position: relative; overflow: hidden;
-    }
-    .btn:active { transform: scale(0.96); }
+      .panel-services {
+        background: var(--bg);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
 
-    /* Shimmer keyframe for primary buttons */
-    @keyframes shimmer {
-      0%   { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
+      /* ── Customer bar ── */
+      .customer-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-card);
+        flex-shrink: 0;
+      }
+      .cust-field-wrap {
+        position: relative;
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: var(--accent-text); font-weight: 700;
-      box-shadow: 0 2px 12px var(--accent-glow);
-    }
-    .btn-primary:hover {
-      filter: brightness(1.1);
-      box-shadow: 0 4px 22px var(--accent-glow), 0 0 0 1px var(--accent-border);
-      transform: translateY(-1px);
-    }
-    .btn-primary:active { transform: translateY(0) scale(0.97); }
+        flex: 1;
 
-    /* Shimmer sweep on primary hover */
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
-      background-size: 200% 100%;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .btn-primary:hover::after {
-      opacity: 1;
-      animation: shimmer 0.65s ease forwards;
-    }
+        display: flex;
 
-    .btn-save { width: 100%; padding: 13px; font-size: 14px; letter-spacing: 0.02em; }
+        align-items: center;
+      }
+      .cust-icon {
 
-    .btn-secondary {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-    .btn-secondary:hover {
-      border-color: var(--accent-border);
-      color: var(--accent);
-      background: var(--accent-dim);
-      box-shadow: 0 0 0 1px var(--accent-border);
-    }
+  width: 38px;
 
-    .btn-ghost {
-      background: none; border: 1px solid var(--border);
-      color: var(--text-muted); padding: 7px 13px; font-size: 12px;
-    }
-    .btn-ghost:hover {
-      border-color: var(--accent-border); color: var(--accent);
-      background: var(--accent-dim);
-      box-shadow: 0 0 8px var(--accent-glow);
-    }
+  min-width: 38px;
 
-    .btn-danger {
-      background: rgba(201,76,76,0.1);
-      border: 1px solid rgba(201,76,76,0.22);
-      color: var(--danger); font-size: 12px; padding: 7px 13px;
-    }
-    .btn-danger:hover {
-      background: rgba(201,76,76,0.2);
-      box-shadow: 0 0 10px rgba(201,76,76,0.2);
-    }
-
-    .btn-wa {
-      background: rgba(37,211,102,0.1);
-      border: 1px solid rgba(37,211,102,0.22);
-      color: var(--whatsapp); font-size: 12px; padding: 5px 12px;
-    }
-    .btn-wa:hover { background: rgba(37,211,102,0.2); }
-
-    .btn-settings {
-      background: none; border: 1px solid var(--border);
-      color: var(--text-muted); padding: 7px 14px;
-      border-radius: var(--radius-sm); cursor: pointer;
-      font-family: 'DM Sans', sans-serif; font-size: 12px;
-      display: flex; align-items: center; gap: 6px;
-      transition: all var(--tr);
-    }
-    .btn-settings:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ══════════════════════════════════════════
-       INCOME STRIP
-    ══════════════════════════════════════════ */
-    .income-strip {
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 24px;
-      display: flex; align-items: center; gap: 4px;
-    }
-    .income-strip-label {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
-      color: var(--text-dim); margin-right: 6px;
-    }
-    .income-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 7px 16px;
-      display: flex; flex-direction: column; gap: 1px;
-      transition: border-color var(--tr), box-shadow var(--tr), transform var(--tr);
-      cursor: default;
-    }
-    .income-card:hover {
-      border-color: var(--accent-border);
-      box-shadow: 0 0 12px var(--accent-glow);
-      transform: translateY(-1px);
-    }
-    .income-card .ic-label {
-      font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-dim);
-    }
-    .income-card .ic-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px; font-weight: 600; color: var(--accent);
-      line-height: 1.2;
-      transition: color var(--tr);
-    }
-    .income-card .ic-value small { font-size: 13px; }
-    .income-divider { width: 1px; height: 34px; background: var(--border); margin: 0 5px; }
-
-    .report-actions {
-      margin-left: auto;
-      display: flex;
-      gap: 8px;
-    }
-
-    /* ══════════════════════════════════════════
-       MAIN LAYOUT
-    ══════════════════════════════════════════ */
-    .main-layout {
-      display: grid;
-      grid-template-columns: 370px 1fr;
-      gap: 18px;
-      padding: 20px 24px;
-      max-width: 1440px;
-      margin: 0 auto;
-    }
-    .left-col  { display: flex; flex-direction: column; gap: 16px; }
-    .right-col { display: flex; flex-direction: column; gap: 16px; }
-
-    /* ── CARDS ── */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      animation: fadeUp 0.25s ease both;
-    }
-    .left-col  .card:nth-child(2) { animation-delay: 0.05s; }
-    .right-col .card:nth-child(1) { animation-delay: 0.08s; }
-    .right-col .card:nth-child(2) { animation-delay: 0.13s; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .card-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 15px; font-weight: 600; color: var(--text);
-      display: flex; align-items: center; gap: 7px;
-    }
-    .card-title .ct-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent); flex-shrink: 0;
-      transition: background var(--tr);
-    }
-    .card-body { padding: 18px; }
-
-    /* ── FORM ELEMENTS ── */
-    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; }
-    .field:last-child { margin-bottom: 0; }
-    .field-label {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-dim);
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="date"],
-    textarea,
-    select,
-    #phone,
-    #name,
-    #serviceName,
-    #servicePrice,
-    #searchInput,
-    #offerMessage {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      padding: 9px 12px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      width: 100%;
-      outline: none;
-      transition: border-color var(--tr), box-shadow var(--tr);
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    input:focus, textarea:focus, select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-dim);
-    }
-    input::placeholder, textarea::placeholder { color: var(--text-dim); }
-
-    /* ── PHONE + SUGGESTIONS ── */
-    .phone-wrap { position: relative; width: 100%; }
-    #phone { font-size: 14px; letter-spacing: 0.04em; width: 100%; }
-
-    #suggestionsBox {
-      position: absolute !important;
-      top: calc(100% + 3px) !important;
-      left: 0 !important;
-      width: 100% !important;
-      max-height: 130px !important;
-      overflow-y: auto !important;
-      z-index: 200 !important;
-      background: var(--bg-elevated) !important;
-      border: 1px solid var(--accent-border) !important;
-      border-radius: var(--radius-sm) !important;
-      box-shadow: var(--shadow) !important;
-    }
-    #suggestionsBox > * {
-      padding: 9px 13px;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 13px;
-      border-bottom: 1px solid var(--border);
-      transition: background var(--tr), color var(--tr);
-      display: block;
-    }
-    #suggestionsBox > *:last-child { border-bottom: none; }
-    #suggestionsBox > *:hover {
-      background: var(--accent-dim);
-      color: var(--accent);
-    }
-
-    /* ── LAST VISIT PILL ── */
-    #lastVisitInfo {
-      background: var(--accent-dim) !important;
-      border: 1px solid var(--accent-border) !important;
-      border-radius: var(--radius-sm) !important;
-      color: var(--accent) !important;
-      font-size: 12px !important;
-      padding: 8px 12px !important;
-      margin: 0 0 13px !important;
-      transition: background var(--tr), border-color var(--tr), color var(--tr);
-    }
-
-    /* ── SERVICE CHIPS ── */
-    #servicesContainer {
-      display: flex; flex-wrap: wrap; gap: 7px;
-      margin-bottom: 14px;
-    }
-    #servicesContainer button {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
-      padding: 7px 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all var(--tr);
-      position: relative; overflow: hidden;
-    }
-    #servicesContainer button:hover {
-      border-color: var(--accent-border);
-      color: var(--accent);
-      background: var(--accent-dim);
-      transform: translateY(-1px) scale(1.03);
-      box-shadow: 0 4px 12px var(--accent-glow);
-    }
-    #servicesContainer button:active {
-      transform: scale(0.97);
-    }
-    /* Flash on click */
-    #servicesContainer button::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--accent);
-      opacity: 0;
-      border-radius: inherit;
-      transition: opacity 0.08s;
-    }
-    #servicesContainer button:active::after { opacity: 0.12; }
-
-    /* ── TOGGLE GROUPS ── */
-    .toggle-group { display: flex; gap: 8px; }
-    .toggle-group button {
-      flex: 1; padding: 9px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg-elevated);
-      color: var(--text-muted);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      transition: all 0.2s ease;
-    }
-    .toggle-group button:hover {
-      border-color: var(--accent-border);
-      color: var(--accent);
-    }
-    .toggle-group button.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-dim);
-      box-shadow: 0 0 8px var(--accent-glow);
-      font-weight: 600;
-    }
-
-    /* ── TOTAL ROW ── */
-    .total-row {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 11px 15px;
-      margin-bottom: 14px;
-      transition: border-color var(--tr), box-shadow var(--tr);
-    }
-    .total-row:hover {
-      border-color: var(--accent-border);
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
-    .total-row .tr-label {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-dim);
-    }
-    .total-row .tr-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px; font-weight: 700; color: var(--accent);
-      transition: color var(--tr);
-    }
-
-    /* ── ACTION ROW ── */
-    .action-row { display: flex; gap: 8px; margin-bottom: 14px; }
-    .action-row .btn { flex: 1; }
-
-    /* ── WHATSAPP TOGGLE ── */
-    .wa-toggle {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 14px; cursor: pointer;
-      transition: border-color var(--tr);
-    }
-    .wa-toggle:hover { border-color: rgba(37,211,102,0.35); }
-    .wa-toggle span { font-size: 12px; color: var(--text-muted); }
-    #autoWhatsapp { accent-color: var(--whatsapp); width: auto; margin: 0; }
-
-    /* ── STATUS ── */
-    #status {
-      text-align: center; font-size: 12px; min-height: 18px;
-      color: var(--success) !important;
-      margin-top: 8px;
-      animation: statusFade 2s ease forwards;
-    }
-    @keyframes statusFade {
-      0%   { opacity: 0; transform: translateY(-4px); }
-      10%  { opacity: 1; transform: translateY(0); }
-      80%  { opacity: 1; }
-      100% { opacity: 0; }
-    }
-
-    /* ── DIVIDER ── */
-    .sep { height: 1px; background: var(--border); margin: 14px 0; }
-
-    /* ── HISTORY BOX ── */
-    #historyBox {
-      display: flex; flex-direction: column; gap: 7px;
-      margin-top: 12px;
-      max-height: 320px;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-      padding-right: 2px;
-    }
-    #historyBox > div {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 13px;
-      transition: border-color var(--tr), background var(--tr), transform var(--tr);
-      animation: slideIn 0.2s ease both;
-    }
-    #historyBox > div:hover {
-      border-color: var(--accent-border);
-      background: rgba(255,255,255,0.02);
-      transform: translateX(2px);
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-6px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
-    /* ── DATE FILTER ROW ── */
-    .date-filter-row { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
-    .date-filter-row input[type="date"] { flex: 1; min-width: 120px; }
-
-    /* ── DATA TOOLS ── */
-    .data-tools { display: flex; gap: 7px; flex-wrap: wrap; }
-    .data-tools .btn { flex: 1; min-width: 90px; }
-
-    /* ═══════════════════════════════════════
-       REPORT MODAL
-    ═══════════════════════════════════════ */
-    .report-modal {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(6px);
-      display: none; align-items: center; justify-content: center;
-      z-index: 999;
-      animation: backdropIn 0.2s ease;
-    }
-    .report-modal.open { display: flex; }
-    @keyframes backdropIn {
-      from { opacity: 0; } to { opacity: 1; }
-    }
-    .report-box {
-      width: 380px;
-      background: var(--bg-card);
-      border: 1px solid var(--accent-border);
-      border-radius: 14px;
-      box-shadow: var(--shadow), 0 0 30px var(--accent-glow);
-      overflow: hidden;
-      animation: modalPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    @keyframes modalPop {
-      from { opacity: 0; transform: scale(0.92) translateY(8px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    .report-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-      font-weight: 600; font-size: 15px;
-    }
-    .report-header button {
-      background: none; border: 1px solid var(--border);
-      color: var(--text-muted); border-radius: 6px;
-      cursor: pointer; padding: 4px 9px; font-size: 13px;
-      transition: all var(--tr);
-    }
-    .report-header button:hover { border-color: var(--danger); color: var(--danger); }
-    .report-body {
-      padding: 18px; display: flex; flex-direction: column; gap: 12px;
-    }
-    .report-body label { font-size: 11px; color: var(--text-dim); }
-    .report-body select, .report-body input { width: 100%; }
-
-    /* ═══════════════════════════════════════
-       SERVICE MODAL (legacy — keep for compat)
-    ═══════════════════════════════════════ */
-    #serviceModal {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.72);
-      backdrop-filter: blur(6px);
-      z-index: 500;
-      display: none; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    #serviceModal.open { display: flex; }
-    .modal-box {
-      background: var(--bg-card);
-      border: 1px solid var(--accent-border);
-      border-radius: 16px;
-      width: 460px; max-width: 100%; max-height: 85vh;
-      display: flex; flex-direction: column;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.65), 0 0 30px var(--accent-glow);
-      overflow: hidden;
-      animation: modalPop 0.22s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .modal-header {
-      padding: 18px 22px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .modal-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px; font-weight: 600; color: var(--text);
-    }
-    .modal-close {
-      background: none; border: 1px solid var(--border);
-      color: var(--text-muted); width: 28px; height: 28px;
-      border-radius: var(--radius-xs); cursor: pointer; font-size: 15px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all var(--tr); flex-shrink: 0;
-    }
-    .modal-close:hover { border-color: var(--danger); color: var(--danger); }
-    .modal-body {
-      padding: 22px; overflow-y: auto; scroll-behavior: smooth; flex: 1;
-    }
-    .modal-add-row {
-      display: flex; gap: 8px; align-items: flex-end; margin-bottom: 18px; flex-wrap: wrap;
-    }
-    .modal-add-row .field { flex: 1; min-width: 110px; margin-bottom: 0; }
-    .modal-add-row .field-price { max-width: 105px; flex: none; }
-    .modal-add-row .btn { flex-shrink: 0; height: 38px; align-self: flex-end; }
-
-    /* Service list in modal */
-    #serviceList {
-      max-height: 300px; overflow-y: auto; scroll-behavior: smooth;
-      display: flex; flex-direction: column; gap: 6px; padding-right: 2px;
-    }
-    #serviceList > div {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 9px 13px;
-      display: flex; align-items: center; justify-content: space-between;
-      transition: border-color var(--tr);
-    }
-    #serviceList > div:hover { border-color: var(--accent-border); }
-
-    /* ═══════════════════════════════════════
-       ADMIN PANEL — SLIDE-IN DRAWER
-    ═══════════════════════════════════════ */
-    #adminPanel {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.72);
-      backdrop-filter: blur(6px);
-      z-index: 500;
-      display: flex; align-items: stretch; justify-content: flex-end;
-    }
-    #adminPanel.hidden { display: none; }
-
-    .admin-drawer {
-      background: var(--bg-card);
-      border-left: 1px solid var(--accent-border);
-      width: min(700px, 90vw);
-      display: flex; flex-direction: column;
-      box-shadow: -12px 0 60px rgba(0,0,0,0.6), 0 0 0 1px var(--accent-border);
-      animation: drawerSlideIn 0.26s cubic-bezier(0.34,1.2,0.64,1);
-      overflow: hidden;
-    }
-    @keyframes drawerSlideIn {
-      from { transform: translateX(60px); opacity: 0; }
-      to   { transform: translateX(0); opacity: 1; }
-    }
-
-    .admin-header {
-      padding: 18px 22px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .admin-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px; font-weight: 700; color: var(--text);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .admin-title span { color: var(--accent); transition: color var(--tr); }
-
-    /* ADMIN TABS */
-    .admin-tabs {
-      display: flex; border-bottom: 1px solid var(--border);
-      flex-shrink: 0; padding: 0 22px; gap: 0;
-    }
-    .admin-tab {
-      padding: 11px 18px; cursor: pointer;
-      font-size: 13px; font-weight: 500;
-      color: var(--text-muted);
-      border-bottom: 2px solid transparent;
-      transition: all var(--tr);
-      background: none; border-top: none; border-left: none; border-right: none;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .admin-tab:hover { color: var(--text); }
-    .admin-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    /* ADMIN BODY */
-    .admin-body { flex: 1; overflow-y: auto; padding: 22px; }
-
-    .tab-pane { display: none; animation: fadeUp 0.18s ease both; }
-    .tab-pane.active { display: block; }
-
-    /* ── DASHBOARD TAB ── */
-    .dash-stats {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;
-    }
-    .dash-stat {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 10px; padding: 13px 15px;
-      transition: border-color var(--tr), box-shadow var(--tr), transform var(--tr);
-    }
-    .dash-stat:hover {
-      border-color: var(--accent-border);
-      box-shadow: 0 0 14px var(--accent-glow);
-      transform: translateY(-2px);
-    }
-    .dash-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-dim); margin-bottom: 5px; }
-    .dash-stat-val {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 24px; font-weight: 700; color: var(--accent);
-      transition: color var(--tr);
-    }
-    .dash-stat-sub { font-size: 10px; color: var(--success); margin-top: 3px; }
-
-    .chart-card {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px; margin-bottom: 14px;
-    }
-    .chart-card-title {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
-      color: var(--text-dim); margin-bottom: 14px;
-    }
-    canvas#paymentChart { width: 100% !important; max-height: 200px; }
-
-    .leaderboard-card {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px;
-    }
-    .leaderboard-title {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
-      color: var(--text-dim); margin-bottom: 12px;
-    }
-    #staffLeaderboard { display: flex; flex-direction: column; gap: 6px; }
-    .staff-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 12px; border-radius: 8px; margin-bottom: 0;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid transparent;
-      transition: border-color var(--tr), background var(--tr);
-    }
-    .staff-row:hover { border-color: var(--accent-border); background: var(--accent-dim); }
-    .rank { font-weight: bold; color: var(--accent); transition: color var(--tr); }
-    .name { flex: 1; margin-left: 10px; font-size: 13px; }
-    .amount { font-weight: bold; font-size: 13px; }
-
-    /* ── SERVICES TAB ── */
-    .svc-add-row {
-      display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px;
-    }
-    .svc-add-row .field { flex: 1; margin-bottom: 0; }
-    .svc-add-row .field-price { max-width: 100px; flex: none; }
-
-    #adminServiceList { display: flex; flex-direction: column; gap: 6px; }
-    #adminServiceList > div {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 14px;
-      display: flex; align-items: center; gap: 8px;
-      transition: border-color var(--tr);
-    }
-    #adminServiceList > div:hover { border-color: var(--accent-border); }
-    #adminServiceList input[type=number] {
-      width: 70px; background: var(--bg-input); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--text); padding: 5px 8px; font-size: 12px;
-    }
-
-    /* ── CRM TAB ── */
-    #offerMessage {
-      resize: vertical; min-height: 78px;
-    }
-    .crm-filter-row {
-      display: flex; gap: 7px; align-items: center; flex-wrap: wrap; margin: 10px 0;
-    }
-    #filterType { flex: 1; min-width: 140px; }
-    #searchInput { flex: 1; min-width: 130px; }
-
-    #customerList {
-      max-height: 340px; overflow-y: auto; scroll-behavior: smooth;
-      display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding-right: 2px;
-    }
-    .customer-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 13px; border-radius: 8px; cursor: pointer;
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      transition: all var(--tr);
-    }
-    .customer-row:hover { border-color: var(--accent-border); background: var(--accent-dim); }
-    .customer-row.vip { background: #3a2f0b; border-color: rgba(201,168,76,0.2); }
-    .customer-row.vip:hover { border-color: var(--accent-border); }
-    .customer-row.inactive { background: #3a1a1a; border-color: rgba(201,76,76,0.15); color: #ff6b6b; }
-
-    /* ── DATA TAB ── */
-    .data-section { margin-bottom: 20px; }
-    .data-section-label {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
-      color: var(--text-dim); margin-bottom: 10px;
-    }
-    .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .data-action-btn {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 10px; padding: 14px 16px; cursor: pointer;
-      text-align: left; transition: all var(--tr);
-      font-family: 'DM Sans', sans-serif;
-    }
-    .data-action-btn:hover {
-      border-color: var(--accent-border);
-      background: var(--accent-dim);
-      box-shadow: 0 0 12px var(--accent-glow);
-      transform: translateY(-1px);
-    }
-    .data-action-btn.danger { border-color: rgba(201,76,76,0.2); }
-    .data-action-btn.danger:hover {
-      border-color: var(--danger);
-      background: rgba(201,76,76,0.08);
-      box-shadow: 0 0 12px rgba(201,76,76,0.2);
-    }
-    .dab-icon { font-size: 20px; margin-bottom: 6px; display: block; }
-    .dab-label { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
-    .dab-desc { font-size: 11px; color: var(--text-dim); display: block; }
-    .data-action-btn.danger .dab-label { color: var(--danger); }
-
-    .report-section {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px;
-    }
-    .report-section select { margin-bottom: 10px; }
-    #customDates { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-
-    /* ═══════════════════════════════════════
-       FOOTER
-    ═══════════════════════════════════════ */
-    .bottom-bar {
-      background: var(--bg-card);
-      border-top: 1px solid var(--border);
-      padding: 9px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 11px; color: var(--text-dim);
-    }
-    .footer-left { display: flex; align-items: center; gap: 12px; }
-    .footer-brand {
-      color: var(--accent); font-family: 'Cormorant Garamond', serif;
-      font-size: 13px; font-weight: 600; transition: color var(--tr);
-    }
-    .footer-credit {
-      font-size: 11px; color: var(--text-dim);
-      font-style: italic; letter-spacing: 0.02em;
-    }
-    .footer-credit span { color: var(--accent); transition: color var(--tr); }
-
-    /* ═══════════════════════════════════════
-       CUSTOMER ROW (CRM)
-    ═══════════════════════════════════════ */
-    #customerList:empty::after {
-      content: 'Load customers to send offers';
-      display: block; text-align: center;
-      padding: 30px 0; color: var(--text-dim); font-size: 13px;
-    }
-
-    /* Row layout */
-.modal-add-row {
   display: flex;
-  gap: 12px;
-  align-items: flex-end;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: var(--txt-dim);
+
+  font-size: 18px;
 }
+      .cust-input {
 
-/* Field container */
-.field {
-  display: flex;
-  flex-direction: column;
   flex: 1;
-}
 
-/* Price field smaller */
-.field-price {
-  flex: 0 0 110px;
-}
+  height: 100%;
 
-/* Labels */
-.field-label {
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-bottom: 4px;
-}
+  border: none;
 
-/* Inputs (force dark theme) */
-.field input {
-  height: 38px;
-  padding: 0 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text);
+  background: transparent;
+
+  color: var(--txt);
+
+  font-family: 'Space Grotesk', sans-serif;
+
+  font-size: 13px;
+
   outline: none;
-  transition: all 0.2s ease;
+
+  padding-right: 12px;
+}
+      .cust-input:focus {
+        border-color: var(--acc);
+        box-shadow: 0 0 0 2px var(--acc-dim);
+      }
+
+      .cust-input-shell {
+
+  display: flex;
+
+  align-items: center;
+
+  background: var(--bg-input);
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--r-sm);
+
+  height: 38px;
+
+  overflow: hidden;
+
+  transition:
+    border-color var(--tr),
+    box-shadow var(--tr);
 }
 
-/* Focus effect */
-.field input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-dim);
+.cust-input-shell:focus-within {
+
+  border-color: var(--acc);
+
+  box-shadow:
+    0 0 0 2px var(--acc-dim);
+}
+      .cust-input::placeholder {
+        color: var(--txt-dim);
+      }
+      #suggestionsBox {
+        position: absolute;
+        top: calc(100% + 3px);
+        left: 0;
+        width: 100%;
+        max-height: 130px;
+        overflow-y: auto;
+        z-index: 200;
+        background: var(--bg-elevated);
+        border: 1px solid var(--acc-border);
+        border-radius: var(--r-sm);
+        box-shadow: var(--shadow);
+        display: none;
+      }
+      #suggestionsBox > * {
+        padding: 8px 12px;
+        cursor: pointer;
+        color: var(--txt-muted);
+        font-size: 12px;
+        border-bottom: 1px solid var(--border);
+        display: block;
+        transition: all var(--tr);
+      }
+      #suggestionsBox > *:last-child {
+        border-bottom: none;
+      }
+      #suggestionsBox > *:hover {
+        background: var(--acc-dim);
+        color: var(--acc);
+      }
+      #lastVisitInfo {
+        font-size: 11px;
+        color: var(--acc);
+        background: var(--acc-dim);
+        border: 1px solid var(--acc-border);
+        border-radius: var(--r-xs);
+        padding: 5px 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 0;
+        transition:
+          background var(--tr),
+          border-color var(--tr),
+          color var(--tr);
+      }
+
+      .name-wrap {
+
+  width: 220px;
+
+  min-width: 180px;
+
+  max-width: 240px;
+
+  flex-shrink: 0;
+}
+.customer-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+}
+.cust-field-wrap {
+  flex: 1.2;
+  position: relative;
 }
 
-/* Placeholder */
-.field input::placeholder {
-  color: rgba(255,255,255,0.35);
+.name-wrap {
+  flex: 1;
+  min-width: 0;      /* prevents overflow */
+  max-width: none;   /* remove the 240px cap */
 }
+      /* ── Gender + options bar ── */
+      .options-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-card);
+        flex-shrink: 0;
+      }
+      .gender-tabs {
+        display: flex;
+        gap: 4px;
+      }
+      .gender-tab {
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: none;
+        color: var(--txt-muted);
+        font-family: "Space Grotesk", sans-serif;
+        transition: all var(--tr);
+      }
+      .gender-tab:hover {
+        border-color: var(--acc-border);
+        color: var(--acc);
+      }
+      .gender-tab.active {
+        background: var(--acc);
+        border-color: var(--acc);
+        color: var(--acc-text);
+        font-weight: 600;
+      }
 
-/* Add button alignment */
-.modal-add-row .btn {
-  margin-bottom: 0;
-}
+      .sep-v {
+        width: 1px;
+        height: 22px;
+        background: var(--border);
+        margin: 0 4px;
+        flex-shrink: 0;
+      }
 
+      /* Hair length inline */
+      .hair-len-wrap {
+        display: none;
+        align-items: center;
+        gap: 4px;
+      }
+      .hair-len-wrap.show {
+        display: flex;
+      }
+      .hl-btn {
+        padding: 4px 10px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: none;
+        color: var(--txt-muted);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all var(--tr);
+      }
+      .hl-btn:hover {
+        border-color: var(--acc-border);
+        color: var(--acc);
+      }
+      .hl-btn.active {
+        background: var(--acc-dim);
+        border-color: var(--acc);
+        color: var(--acc);
+        font-weight: 600;
+      }
 
-    /* ═══════════════════════════════════════
-       GENDER TABS (Men / Women)
-    ═══════════════════════════════════════ */
-    .gender-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      margin: -18px -18px 16px -18px;
-    }
-    .gender-tab {
-      flex: 1; padding: 10px; text-align: center;
-      font-size: 13px; font-weight: 500;
-      cursor: pointer; border: none; background: none;
-      color: var(--text-muted); border-bottom: 2px solid transparent;
-      font-family: 'DM Sans', sans-serif;
-      transition: all var(--tr);
-    }
-    .gender-tab:hover { color: var(--text); }
-    .gender-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-      background: var(--accent-dim);
-    }
+      /* ── Category tabs ── */
+      .cat-bar {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-card);
+        overflow-x: auto;
+        flex-shrink: 0;
+      }
+      .cat-bar::-webkit-scrollbar {
+        height: 0;
+      }
+      .cat-tab {
+        padding: 10px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        background: none;
+        color: var(--txt-muted);
+        border-bottom: 2px solid transparent;
+        font-family: "Space Grotesk", sans-serif;
+        white-space: nowrap;
+        transition: all var(--tr);
+        flex-shrink: 0;
+      }
+      .cat-tab:hover {
+        color: var(--txt);
+      }
+      .cat-tab.active {
+        color: var(--acc);
+        border-bottom-color: var(--acc);
+      }
 
-    /* ═══════════════════════════════════════
-       HAIR LENGTH SELECTOR (Women)
-    ═══════════════════════════════════════ */
-    .hair-len-wrap { display: none; margin-bottom: 12px; }
-    .hair-len-wrap.show { display: block; }
-    .hair-len-btns { display: flex; gap: 5px; }
-    .hl-btn {
-      flex: 1; padding: 6px 4px; border-radius: var(--radius-xs);
-      border: 1px solid var(--border); background: var(--bg-elevated);
-      color: var(--text-muted); font-family: 'DM Sans', sans-serif;
-      font-size: 11px; cursor: pointer; text-align: center;
-      transition: all var(--tr);
-    }
-    .hl-btn:hover { border-color: var(--accent-border); color: var(--accent); }
-    .hl-btn.active {
-      border-color: var(--accent); background: var(--accent-dim);
-      color: var(--accent); font-weight: 600;
-    }
+      /* ── Service grid ── */
+      .svc-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px 14px;
+      }
+      .svc-section-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+        margin-bottom: 8px;
+        margin-top: 4px;
+      }
+      .svc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .svc-btn {
+        background: var(--bg-card);
 
-    /* ═══════════════════════════════════════
-       CATEGORY TABS
-    ═══════════════════════════════════════ */
-    .cat-tabs-wrap { margin-bottom: 10px; }
-    .cat-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
-    .cat-tab {
-      padding: 4px 10px; border-radius: 20px; font-size: 11px;
-      cursor: pointer; border: 1px solid var(--border);
-      background: none; color: var(--text-muted);
-      font-family: 'DM Sans', sans-serif; transition: all var(--tr);
-    }
-    .cat-tab:hover { border-color: var(--accent-border); color: var(--accent); }
-    .cat-tab.active {
-      background: var(--accent); color: var(--accent-text);
-      border-color: var(--accent); font-weight: 600;
-    }
+        border: 1px solid var(--border);
 
-    /* ═══════════════════════════════════════
-       SERVICE GRID (replaces flat chip list)
-    ═══════════════════════════════════════ */
-    .svc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-    .svc-btn {
-      padding: 8px 10px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); background: var(--bg-elevated);
-      color: var(--text); font-family: 'DM Sans', sans-serif;
-      font-size: 12px; cursor: pointer; text-align: left;
-      transition: all var(--tr); position: relative;
-    }
-    .svc-btn:hover {
-      border-color: var(--accent-border); color: var(--accent);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px var(--accent-glow);
-    }
-    .svc-btn.selected {
-      background: var(--accent-dim);
-      border-color: var(--accent); color: var(--accent);
-    }
-    .svc-btn .svc-price {
-      font-size: 11px; color: var(--text-muted);
-      display: block; margin-top: 2px;
-    }
-    .svc-btn.selected .svc-price { color: var(--accent); }
-    .svc-btn .svc-check {
-      position: absolute; top: 5px; right: 7px;
-      font-size: 11px; opacity: 0;
-    }
-    .svc-btn.selected .svc-check { opacity: 1; }
+        border-radius: var(--r-sm);
 
-    /* Admin gender/category badges */
-    .svc-badge {
-      font-size: 9px; padding: 2px 7px; border-radius: 20px;
-      font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
-      display: inline-block; margin-right: 4px;
-    }
-    .svc-badge.men   { background:rgba(74,144,217,.15); color:#74B0F0; border:1px solid rgba(74,144,217,.25); }
-    .svc-badge.women { background:rgba(201,82,106,.15); color:#E07A90; border:1px solid rgba(201,82,106,.25); }
-    .svc-badge.cat   { background:var(--accent-dim); color:var(--accent); border:1px solid var(--accent-border); }
+        padding: 10px 10px 8px;
 
-  </style>
-</head>
-<body>
+        text-align: left;
 
-<!-- ══════ SERVICE MODAL (legacy compat) ══════ -->
-<div id="serviceModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span class="modal-title">✦ Service Management</span>
-      <button class="modal-close" onclick="document.getElementById('serviceModal').classList.remove('open')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-add-row">
-        <div class="field">
-          <span class="field-label">Service Name</span>
-          <input id="serviceName" placeholder="e.g. Haircut, Facial…" />
+        cursor: pointer;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 4px;
+
+        position: relative;
+
+        overflow: hidden;
+
+        min-height: 58px;
+
+        transition: all var(--tr);
+
+        color: var(--txt);
+      }
+      .svc-btn * {
+        color: inherit;
+      }
+      /* category color strip */
+      .svc-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--cat-color, var(--border-hi));
+        transition: background var(--tr);
+      }
+      .svc-btn:hover {
+        border-color: var(--acc-border);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        transform: translateY(-1px);
+      }
+      .svc-btn.selected {
+        background: var(--acc-dim);
+
+        border-color: var(--acc);
+
+        color: var(--acc-light);
+      }
+      .svc-btn.selected::before {
+        background: var(--acc);
+      }
+      .svc-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--txt);
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .svc-price {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--txt-muted);
+      }
+
+      .svc-check {
+        position: absolute;
+        top: 5px;
+        right: 6px;
+        font-size: 11px;
+        color: var(--acc);
+        opacity: 0;
+        transition: opacity var(--tr);
+      }
+      .svc-btn.selected .svc-check {
+        opacity: 1;
+      }
+
+      /* ══════════════════════════════════════════
+       RIGHT PANEL — BILLING / CART
+    ══════════════════════════════════════════ */
+      .panel-cart {
+        background: var(--bg-card);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* LIGHT MODE ENHANCEMENTS */
+
+      [data-mode="light"] .svc-btn:hover {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      }
+
+      [data-mode="light"] .panel-cart {
+        border-left: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      [data-mode="light"] .svc-btn {
+        background: #ffffff;
+      }
+
+      [data-mode="light"] .topbar {
+        background: rgba(255, 255, 255, 0.85);
+
+        backdrop-filter: blur(10px);
+      }
+
+      [data-mode="light"] .svc-btn.selected {
+        box-shadow: 0 4px 18px rgba(99, 102, 241, 0.12);
+      }
+
+      /* ── Cart header ── */
+      .cart-header {
+        padding: 12px 14px 10px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .cart-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .cart-clear-btn {
+        background: none;
+        border: none;
+        color: var(--txt-dim);
+        font-size: 10px;
+        cursor: pointer;
+        font-family: "Space Grotesk", sans-serif;
+        padding: 0;
+        transition: color var(--tr);
+      }
+      .cart-clear-btn:hover {
+        color: var(--danger);
+      }
+
+      /* ── Cart items ── */
+      .cart-items {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .cart-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--r-xs);
+        animation: slideIn 0.15s ease both;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .cart-item-name {
+        flex: 1;
+        font-size: 12px;
+        color: var(--txt);
+      }
+      .cart-item-price {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        color: var(--txt-muted);
+      }
+      .cart-item-del {
+        background: none;
+        border: none;
+        color: var(--txt-dim);
+        cursor: pointer;
+        padding: 1px;
+        transition: color var(--tr);
+        display: flex;
+        align-items: center;
+      }
+      .cart-item-del:hover {
+        color: var(--danger);
+      }
+      .cart-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 80px;
+        gap: 6px;
+        color: var(--txt-dim);
+        font-size: 12px;
+      }
+
+      /* ── Bottom: staff/payment/total/save ── */
+      .cart-footer {
+        padding: 12px 14px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .toggle-row {
+        display: flex;
+        gap: 5px;
+      }
+      .tog-btn {
+        flex: 1;
+        padding: 6px 8px;
+        border-radius: var(--r-xs);
+        border: 1px solid var(--border);
+        background: var(--bg-elevated);
+        color: var(--txt-muted);
+        cursor: pointer;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        text-align: center;
+        transition: all var(--tr);
+      }
+      .tog-btn:hover {
+        border-color: var(--acc-border);
+        color: var(--acc);
+      }
+      .tog-btn.active {
+        border-color: var(--acc);
+        color: var(--acc);
+        background: var(--acc-dim);
+        font-weight: 600;
+      }
+      .toggle-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+        margin-bottom: 4px;
+      }
+
+      .total-display {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        transition: border-color var(--tr);
+      }
+      .total-display:hover {
+        border-color: var(--acc-border);
+      }
+      .total-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+      }
+      .total-amount {
+        font-family: "DM Mono", monospace;
+        font-size: 28px;
+        font-weight: 500;
+        color: var(--acc);
+        transition: color var(--tr);
+      }
+      .total-currency {
+        font-size: 16px;
+        color: var(--txt-muted);
+        margin-right: 2px;
+      }
+
+      .save-btn {
+        width: 100%;
+        padding: 13px;
+        border-radius: var(--r-sm);
+        background: var(--acc);
+        color: var(--acc-text);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all var(--tr);
+        letter-spacing: 0.01em;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+      }
+      .save-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      }
+      .save-btn:active {
+        transform: scale(0.98);
+      }
+
+      .wa-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--txt-muted);
+      }
+      #autoWhatsapp {
+        accent-color: var(--whatsapp);
+        margin: 0;
+      }
+
+      .status-msg {
+        text-align: center;
+        font-size: 11px;
+        color: var(--success);
+        min-height: 16px;
+        animation: statusFade 2.5s ease forwards;
+      }
+      @keyframes statusFade {
+        0% {
+          opacity: 0;
+          transform: translateY(-3px);
+        }
+        10% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .action-btns {
+        display: flex;
+        gap: 6px;
+      }
+      .action-btns .btn {
+        flex: 1;
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+
+      /* ══════════════════════════════════════════
+       MODALS & OVERLAYS
+    ══════════════════════════════════════════ */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 500;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .overlay.open {
+        display: flex;
+      }
+
+      .modal-box {
+        background: var(--bg-card);
+        border: 1px solid var(--acc-border);
+        border-radius: 12px;
+        width: 460px;
+        max-width: 100%;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow:
+          0 24px 60px rgba(0, 0, 0, 0.7),
+          0 0 24px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        animation: modalPop 0.2s cubic-bezier(0.34, 1.5, 0.64, 1);
+      }
+      @keyframes modalPop {
+        from {
+          opacity: 0;
+          transform: scale(0.93) translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      .modal-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+      .modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--txt);
+      }
+      .modal-close {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--txt-muted);
+        width: 26px;
+        height: 26px;
+        border-radius: var(--r-xs);
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--tr);
+      }
+      .modal-close:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .modal-body {
+        padding: 18px;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      /* Service Modal list */
+      #serviceList {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      #serviceList > div {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--r-xs);
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: border-color var(--tr);
+      }
+      #serviceList > div:hover {
+        border-color: var(--acc-border);
+      }
+
+      /* Report modal */
+      .report-box {
+        width: 360px;
+        background: var(--bg-card);
+        border: 1px solid var(--acc-border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        animation: modalPop 0.2s cubic-bezier(0.34, 1.5, 0.64, 1);
+      }
+      .report-header {
+        padding: 13px 17px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .report-header button {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--txt-muted);
+        border-radius: 5px;
+        cursor: pointer;
+        padding: 3px 8px;
+        font-size: 12px;
+        transition: all var(--tr);
+      }
+      .report-header button:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .report-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .report-body label {
+        font-size: 10px;
+        color: var(--txt-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+
+      /* ══════════════════════════════════════════
+       ADMIN PANEL DRAWER
+    ══════════════════════════════════════════ */
+      #adminPanel {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 500;
+        display: flex;
+        align-items: stretch;
+        justify-content: flex-end;
+      }
+      #adminPanel.hidden {
+        display: none;
+      }
+      .admin-drawer {
+        background: var(--bg-card);
+        border-left: 1px solid var(--border);
+        width: min(680px, 92vw);
+        display: flex;
+        flex-direction: column;
+        box-shadow: -8px 0 40px rgba(0, 0, 0, 0.6);
+        animation: drawerSlide 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
+        overflow: hidden;
+      }
+      @keyframes drawerSlide {
+        from {
+          transform: translateX(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .admin-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+      .admin-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--txt);
+      }
+      .admin-title span {
+        color: var(--acc);
+        transition: color var(--tr);
+      }
+      .admin-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        padding: 0 20px;
+      }
+      .admin-tab {
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--txt-muted);
+        border-bottom: 2px solid transparent;
+        transition: all var(--tr);
+        background: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .admin-tab:hover {
+        color: var(--txt);
+      }
+      .admin-tab.active {
+        color: var(--acc);
+        border-bottom-color: var(--acc);
+      }
+      .admin-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      .tab-pane {
+        display: none;
+        animation: fadeUp 0.18s ease both;
+      }
+      .tab-pane.active {
+        display: block;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Dashboard */
+      .dash-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .dash-stat {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        transition: all var(--tr);
+      }
+      .dash-stat:hover {
+        border-color: var(--acc-border);
+        transform: translateY(-1px);
+      }
+      .dash-stat-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+        margin-bottom: 4px;
+      }
+      .dash-stat-val {
+        font-family: "DM Mono", monospace;
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--acc);
+        transition: color var(--tr);
+      }
+      .chart-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+      .chart-card-title {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+        margin-bottom: 12px;
+      }
+      .leaderboard-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+      }
+      .leaderboard-title {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+        margin-bottom: 10px;
+      }
+      #staffLeaderboard {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .staff-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid transparent;
+        transition: all var(--tr);
+      }
+      .staff-row:hover {
+        border-color: var(--acc-border);
+        background: var(--acc-dim);
+      }
+      .rank {
+        font-weight: 700;
+        color: var(--acc);
+        transition: color var(--tr);
+      }
+      .name {
+        flex: 1;
+        margin-left: 10px;
+        font-size: 12px;
+      }
+      .amount {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+      }
+
+      /* Services tab admin */
+      .svc-add-row {
+        display: grid;
+
+        grid-template-columns:
+          2fr
+          110px
+          90px
+          120px
+          auto;
+
+        gap: 10px;
+
+        align-items: end;
+
+        margin-bottom: 14px;
+      }
+      .svc-add-row input,
+      .svc-add-row select {
+        height: 38px;
+      }
+      .svc-add-row .field {
+        flex: 1;
+        margin-bottom: 0;
+      }
+      .svc-add-row .field-price {
+        max-width: 90px;
+        flex: none;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .field-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+      }
+      #adminServiceList {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      #adminServiceList > div {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        transition: border-color var(--tr);
+      }
+      #adminServiceList > div:hover {
+        border-color: var(--acc-border);
+      }
+
+      .svc-badge {
+        font-size: 9px;
+        padding: 2px 6px;
+        border-radius: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: inline-block;
+      }
+      .svc-badge.men {
+        background: rgba(99, 102, 241, 0.15);
+        color: #818cf8;
+        border: 1px solid rgba(99, 102, 241, 0.25);
+      }
+      .svc-badge.women {
+        background: rgba(244, 63, 94, 0.15);
+        color: #fb7185;
+        border: 1px solid rgba(244, 63, 94, 0.25);
+      }
+      .svc-badge.cat {
+        background: var(--acc-dim);
+        color: var(--acc);
+        border: 1px solid var(--acc-border);
+      }
+
+      /* CRM */
+      .crm-filter-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 8px 0;
+      }
+      #customerList {
+        max-height: 340px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 8px;
+      }
+      .customer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        transition: all var(--tr);
+      }
+      .customer-row:hover {
+        border-color: var(--acc-border);
+        background: var(--acc-dim);
+      }
+      .customer-row.vip {
+        background: #2a2206;
+        border-color: rgba(201, 168, 76, 0.15);
+      }
+      .customer-row.inactive {
+        background: #200e0e;
+        border-color: rgba(239, 68, 68, 0.12);
+        color: #f87171;
+      }
+
+      /* Data tab */
+      .data-section {
+        margin-bottom: 18px;
+      }
+      .data-section-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--txt-dim);
+        margin-bottom: 8px;
+      }
+      .data-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+      }
+      .data-action-btn {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        cursor: pointer;
+        text-align: left;
+        transition: all var(--tr);
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .data-action-btn:hover {
+        border-color: var(--acc-border);
+        background: var(--acc-dim);
+        transform: translateY(-1px);
+      }
+      .data-action-btn.danger {
+        border-color: rgba(239, 68, 68, 0.15);
+      }
+      .data-action-btn.danger:hover {
+        border-color: var(--danger);
+        background: rgba(239, 68, 68, 0.07);
+      }
+      .dab-icon {
+        font-size: 18px;
+        margin-bottom: 5px;
+        display: block;
+      }
+      .dab-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--txt);
+        display: block;
+        margin-bottom: 1px;
+      }
+      .dab-desc {
+        font-size: 10px;
+        color: var(--txt-dim);
+        display: block;
+      }
+      .data-action-btn.danger .dab-label {
+        color: var(--danger);
+      }
+      .report-section {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+      }
+
+      .admin-price-input {
+        width: 65px;
+
+        background: var(--bg-input);
+
+        border: 1px solid var(--border);
+
+        border-radius: 6px;
+
+        color: var(--txt);
+
+        padding: 4px 7px;
+
+        font-size: 11px;
+
+        outline: none;
+
+        transition:
+          border-color var(--tr),
+          box-shadow var(--tr);
+      }
+
+      .admin-price-input:focus {
+        border-color: var(--acc);
+
+        box-shadow: 0 0 0 2px var(--acc-dim);
+      }
+
+      .admin-service-name {
+        flex: 1;
+
+        font-size: 12px;
+
+        color: var(--txt);
+
+        font-weight: 500;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+      }
+      /* ── FORM INPUTS GLOBAL ── */
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      textarea,
+      select,
+      #phone,
+      #name,
+      #serviceName,
+      #servicePrice,
+      #searchInput,
+      #offerMessage {
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        color: var(--txt);
+        padding: 7px 10px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12px;
+        width: 100%;
+        outline: none;
+        transition:
+          border-color var(--tr),
+          box-shadow var(--tr);
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: var(--acc);
+        box-shadow: 0 0 0 2px var(--acc-dim);
+      }
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--txt-dim);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 72px;
+      }
+
+      /* HISTORY (in admin/report) */
+      #historyBox {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 10px;
+      }
+      #historyBox > div {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--r-xs);
+        padding: 8px 12px;
+        animation: slideIn 0.15s ease both;
+        transition: border-color var(--tr);
+      }
+      #historyBox > div:hover {
+        border-color: var(--acc-border);
+      }
+      .date-filter-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .date-filter-row input[type="date"] {
+        flex: 1;
+        min-width: 110px;
+      }
+      #customDates {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════ SERVICE MODAL (legacy compat) ══════ -->
+    <div
+      id="serviceModal"
+      class="overlay"
+      onclick="if (event.target === this) this.classList.remove('open');"
+    >
+      <div class="modal-box">
+        <div class="modal-header">
+          <span class="modal-title">Service Management</span>
+          <button
+            class="modal-close"
+            onclick="
+              document.getElementById('serviceModal').classList.remove('open')
+            "
+          >
+            ✕
+          </button>
         </div>
-        <div class="field field-price">
-          <span class="field-label">Price ₹</span>
-          <input id="servicePrice" placeholder="0" type="number" />
-        </div>
-        <button class="btn btn-primary" style="width:auto;padding:0 18px;height:38px;" onclick="addNewService()">+ Add</button>
-      </div>
-      <div id="serviceList"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════ TOPBAR ══════ -->
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-mark">
-      <img src="assets/ironstar.jpg" alt="IronStar Logo" />
-    </div>
-    <span class="brand-name">Iron<span>Star</span></span>
-  </div>
-  <div class="topbar-right">
-    <!-- THEME DOTS -->
-    <div class="theme-dots" title="Switch theme">
-      <div class="theme-dot active" data-t="gold"    title="Gold"    onclick="setTheme('gold',this)"></div>
-      <div class="theme-dot"        data-t="steel"   title="Steel"   onclick="setTheme('steel',this)"></div>
-      <div class="theme-dot"        data-t="emerald" title="Emerald" onclick="setTheme('emerald',this)"></div>
-      <div class="theme-dot"        data-t="rose"    title="Rose"    onclick="setTheme('rose',this)"></div>
-    </div>
-    <span class="badge-pro">PRO</span>
-    <button id="adminBtn" class="btn btn-secondary">⚙ Admin Panel</button>
-    <button class="btn btn-ghost" onclick="backupData()">⬆ Backup</button>
-    <button class="btn btn-ghost" onclick="restoreData()">⬇ Restore</button>
-  </div>
-</header>
-
-<!-- ══════ INCOME STRIP ══════ -->
-<div class="income-strip">
-  <span class="income-strip-label">Income</span>
-  <div class="income-card">
-    <span class="ic-label">Today</span>
-    <span class="ic-value"><small>₹</small><span id="todayIncome">0</span></span>
-  </div>
-  <div class="income-divider"></div>
-  <div class="income-card">
-    <span class="ic-label">This Week</span>
-    <span class="ic-value"><small>₹</small><span id="weekIncome">0</span></span>
-  </div>
-  <div class="income-divider"></div>
-  <div class="income-card">
-    <span class="ic-label">This Month</span>
-    <span class="ic-value"><small>₹</small><span id="monthIncome">0</span></span>
-  </div>
-  <div class="report-actions">
-    <button class="btn btn-ghost" onclick="exportVisits()">📊 Export Visits</button>
-    <button class="btn btn-primary" onclick="openReportModal()">⬇ Download Report</button>
-  </div>
-</div>
-
-<!-- REPORT MODAL -->
-<div id="reportModal" class="report-modal">
-  <div class="report-box">
-    <div class="report-header">
-      <span>📊 Download Report</span>
-      <button onclick="closeReportModal()">✕</button>
-    </div>
-    <div class="report-body">
-      <label>Report Type</label>
-      <select id="reportType" onchange="handleReportType()">
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month">This Month</option>
-        <option value="custom">Custom Range</option>
-      </select>
-      <div id="customDates" style="display:none;">
-        <input type="date" id="reportFrom" />
-        <input type="date" id="reportTo" />
-      </div>
-      <button class="btn btn-primary" onclick="downloadReport()">⬇ Download</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════ MAIN LAYOUT ══════ -->
-<main class="main-layout">
-
-  <!-- LEFT: QUICK ENTRY -->
-  <div class="left-col">
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title"><span class="ct-dot"></span>Quick Entry</span>
-      </div>
-      <div class="card-body">
-
-        <div class="field">
-          <span class="field-label">Phone Number</span>
-          <div class="phone-wrap">
-            <input id="phone" maxlength="10" inputmode="numeric" placeholder="Enter customer phone…" type="text" />
-            <div id="suggestionsBox" style="display:none;"></div>
-          </div>
-        </div>
-
-        <div class="field">
-          <span class="field-label">Customer Name</span>
-          <input id="name" placeholder="Name (if new customer)" />
-        </div>
-
-        <p id="lastVisitInfo" style="display:none;"></p>
-
-        <div class="sep"></div>
-
-        <!-- ══ GENDER TABS ══ -->
-        <div class="gender-tabs">
-          <button class="gender-tab active" data-g="men"   onclick="switchGender('men',this)">✂ Men</button>
-          <button class="gender-tab"        data-g="women" onclick="switchGender('women',this)">✨ Women</button>
-        </div>
-
-        <!-- ══ HAIR LENGTH (women only) ══ -->
-        <div class="hair-len-wrap" id="hairLenWrap">
-          <div class="field-label" style="margin-bottom:6px;">Hair Length</div>
-          <div class="hair-len-btns">
-            <button class="hl-btn active" data-len="Shoulder" onclick="setHairLen(this)">Shoulder</button>
-            <button class="hl-btn" data-len="Mid-Back"        onclick="setHairLen(this)">Mid-back</button>
-            <button class="hl-btn" data-len="Waist"           onclick="setHairLen(this)">Waist &amp; below</button>
-          </div>
-        </div>
-
-        <!-- ══ CATEGORY TABS ══ -->
-        <div class="cat-tabs-wrap">
-          <div class="cat-tabs" id="catTabs"></div>
-        </div>
-
-        <!-- ══ SERVICE GRID ══ -->
-        <div class="svc-grid" id="svcGrid"></div>
-
-        <!-- keep servicesContainer hidden for legacy compat with renderer.js addService() -->
-        <div id="servicesContainer" style="display:none;"></div>
-
-        <div class="total-row">
-          <span class="tr-label">Total Amount</span>
-          <span class="tr-value">₹<span id="total">0</span></span>
-        </div>
-
-        <div class="field">
-          <span class="field-label">Staff</span>
-          <div class="toggle-group">
-            <button class="staff-btn active" data-staff="Senior">Senior</button>
-            <button class="staff-btn" data-staff="Junior">Junior</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <span class="field-label">Payment</span>
-          <div class="toggle-group">
-            <button class="payment-btn active" data-mode="UPI">UPI</button>
-            <button class="payment-btn" data-mode="Cash">Cash</button>
-          </div>
-        </div>
-
-        <div class="action-row" style="margin-top:4px;">
-          <button type="button" class="btn btn-secondary" onclick="repeatLastVisit()">↩ Repeat Last</button>
-          <button type="button" class="btn btn-secondary" onclick="viewHistory()">📋 History</button>
-        </div>
-
-        <label class="wa-toggle">
-          <input type="checkbox" id="autoWhatsapp" />
-          <span>Send WhatsApp receipt after save</span>
-        </label>
-
-        <button type="button" class="btn btn-primary btn-save" onclick="saveVisit()">✓ Save Visit</button>
-        <p id="status"></p>
-
-      </div>
-    </div>
-
-    <!-- Data Tools -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title"><span class="ct-dot"></span>Data Tools</span>
-      </div>
-      <div class="card-body">
-        <div class="data-tools">
-          <button type="button" class="btn btn-ghost" onclick="exportVisits()">⬇ Export Visits</button>
-          <button type="button" class="btn btn-danger" onclick="clearData()">🗑 Clear Data</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT: HISTORY -->
-  <div class="right-col">
-    <div class="card" style="flex:1;">
-      <div class="card-header">
-        <span class="card-title"><span class="ct-dot"></span>Visit History</span>
-      </div>
-      <div class="card-body">
-        <div class="date-filter-row">
-          <input type="date" id="fromDate" />
-          <input type="date" id="toDate" />
-          <button type="button" class="btn btn-secondary" style="padding:8px 14px;font-size:12px;" onclick="filterByDate()">Filter</button>
-        </div>
-        <div id="historyBox"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════ ADMIN PANEL DRAWER ══════ -->
-  <div id="adminPanel" class="hidden">
-    <!-- Clicking the dim backdrop closes the panel -->
-    <div style="flex:1;cursor:pointer;" onclick="document.getElementById('adminPanel').classList.add('hidden')"></div>
-
-    <div class="admin-drawer" onclick="event.stopPropagation()">
-
-      <div class="admin-header">
-        <span class="admin-title">⚙ Admin <span>Panel</span></span>
-        <button class="modal-close" id="closeAdmin">✕</button>
-      </div>
-
-      <!-- TABS -->
-      <div class="admin-tabs">
-        <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
-        <button class="admin-tab" data-tab="services">Services</button>
-        <button class="admin-tab" data-tab="crm">CRM &amp; Offers</button>
-        <button class="admin-tab" data-tab="data">Data &amp; Reports</button>
-      </div>
-
-      <div class="admin-body">
-
-        <!-- ── DASHBOARD TAB ── -->
-        <div class="tab-pane active" id="dashboardTab">
-          <div class="dash-stats">
-            <div class="dash-stat">
-              <div class="dash-stat-label">Today</div>
-              <div class="dash-stat-val">₹<span id="dashToday">—</span></div>
-            </div>
-            <div class="dash-stat">
-              <div class="dash-stat-label">This Week</div>
-              <div class="dash-stat-val">₹<span id="dashWeek">—</span></div>
-            </div>
-            <div class="dash-stat">
-              <div class="dash-stat-label">This Month</div>
-              <div class="dash-stat-val">₹<span id="dashMonth">—</span></div>
-            </div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-card-title">UPI vs Cash Revenue</div>
-            <canvas id="paymentChart"></canvas>
-          </div>
-          <div class="leaderboard-card">
-            <div class="leaderboard-title">Staff Leaderboard</div>
-            <div id="staffLeaderboard"></div>
-          </div>
-        </div>
-
-        <!-- ── SERVICES TAB ── -->
-        <div class="tab-pane" id="servicesTab">
-          <div class="svc-add-row" style="flex-wrap:wrap;">
-            <div class="field" style="min-width:140px;">
+        <div class="modal-body">
+          <div class="svc-add-row" style="margin-bottom: 16px">
+            <div class="field" style="flex: 1">
               <span class="field-label">Service Name</span>
-              <input id="adminServiceName" placeholder="e.g. Haircut, Facial…" />
+              <input id="serviceName" placeholder="e.g. Haircut, Facial…" />
             </div>
             <div class="field field-price">
               <span class="field-label">Price ₹</span>
-              <input id="adminServicePrice" type="number" placeholder="0" />
+              <input id="servicePrice" placeholder="0" type="number" />
             </div>
-            <div class="field" style="max-width:90px;flex:none;">
-              <span class="field-label">Gender</span>
-              <select id="adminServiceGender">
+            <button
+              class="btn btn-primary"
+              style="align-self: flex-end; height: 35px; padding: 0 14px"
+              onclick="addNewService()"
+            >
+              + Add
+            </button>
+          </div>
+          <div id="serviceList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT MODAL -->
+    <div id="reportModal" class="overlay">
+      <div class="report-box">
+        <div class="report-header">
+          <span>Download Report</span>
+          <button onclick="closeReportModal()">✕</button>
+        </div>
+        <div class="report-body">
+          <label>Report Type</label>
+          <select id="reportType" onchange="handleReportType()">
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+          <div id="customDates" style="display: none">
+            <input type="date" id="reportFrom" />
+            <input type="date" id="reportTo" />
+          </div>
+          <button
+            class="btn btn-primary"
+            style="width: 100%; padding: 10px"
+            onclick="downloadReport()"
+          >
+            ⬇ Download
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ APP SHELL ══════ -->
+    <div class="app-shell">
+      <!-- ── TOPBAR ── -->
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-logo">
+            <img src="assets/ironstar.jpg" alt="Logo" />
+          </div>
+          Iron<span class="brand-dot">Star</span>
+        </div>
+
+        <div class="topbar-income">
+          <div class="inc-pill">
+            <span class="inc-label">Today</span>
+            <span class="inc-val">₹<span id="todayIncome">0</span></span>
+          </div>
+          <div class="inc-sep"></div>
+          <div class="inc-pill">
+            <span class="inc-label">Week</span>
+            <span class="inc-val">₹<span id="weekIncome">0</span></span>
+          </div>
+          <div class="inc-sep"></div>
+          <div class="inc-pill">
+            <span class="inc-label">Month</span>
+            <span class="inc-val">₹<span id="monthIncome">0</span></span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button
+            class="btn btn-ghost"
+            id="modeToggleBtn"
+            onclick="toggleMode()"
+          >
+            <span class="material-symbols-outlined" id="modeIcon">
+              dark_mode
+            </span>
+          </button>
+          <div class="theme-dots" title="Switch theme">
+            <div
+              class="theme-dot active"
+              data-t="gold"
+              title="Gold"
+              onclick="setTheme('gold', this)"
+            ></div>
+            <div
+              class="theme-dot"
+              data-t="teal"
+              title="Teal"
+              onclick="setTheme('teal', this)"
+            ></div>
+            <div
+              class="theme-dot"
+              data-t="indigo"
+              title="Indigo"
+              onclick="setTheme('indigo', this)"
+            ></div>
+            <div
+              class="theme-dot"
+              data-t="rose"
+              title="Rose"
+              onclick="setTheme('rose', this)"
+            ></div>
+          </div>
+          <button
+            id="adminBtn"
+            class="btn btn-secondary"
+            style="font-size: 11px"
+          >
+            <span class="material-symbols-outlined" style="font-size: 14px"
+              >settings</span
+            >Admin
+          </button>
+          <button class="btn btn-ghost" onclick="backupData()">
+            <span class="material-symbols-outlined" style="font-size: 14px"
+              >upload</span
+            >Backup
+          </button>
+          <button class="btn btn-ghost" onclick="openReportModal()">
+            <span class="material-symbols-outlined" style="font-size: 14px"
+              >download</span
+            >Report
+          </button>
+        </div>
+      </header>
+
+      <!-- ══ LEFT: SERVICE SELECTION ══ -->
+      <div class="panel-services">
+        <!-- Customer search bar -->
+        <div class="customer-bar">
+          <div class="cust-field-wrap">
+            <div class="cust-input-shell">
+              <span class="material-symbols-outlined cust-icon"> phone </span>
+
+              <input
+                id="phone"
+                class="cust-input"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="Phone number…"
+                type="text"
+              />
+            </div>
+
+            <div id="suggestionsBox"></div>
+          </div>
+          <div class="cust-field-wrap name-wrap">
+
+  <div class="cust-input-shell">
+
+    <span class="material-symbols-outlined cust-icon">
+      person
+    </span>
+
+    <input
+      id="name"
+      class="cust-input"
+      placeholder="Customer name…"
+    />
+
+  </div>
+
+</div>
+          <div id="lastVisitInfo" style="display: none; max-width: 220px"></div>
+        </div>
+
+        <!-- Gender + hair length -->
+        <div class="options-bar">
+          <div class="gender-tabs">
+            <button
+              class="gender-tab active"
+              data-g="men"
+              onclick="switchGender('men', this)"
+            >
+              ✂ Men
+            </button>
+            <button
+              class="gender-tab"
+              data-g="women"
+              onclick="switchGender('women', this)"
+            >
+              ✨ Women
+            </button>
+          </div>
+
+          <div class="sep-v"></div>
+
+          <div class="hair-len-wrap" id="hairLenWrap">
+            <span
+              style="
+                font-size: 10px;
+                color: var(--txt-dim);
+                text-transform: uppercase;
+                letter-spacing: 0.07em;
+                margin-right: 2px;
+              "
+              >Length:</span
+            >
+            <button
+              class="hl-btn active"
+              data-len="Shoulder"
+              onclick="setHairLen(this)"
+            >
+              Shoulder
+            </button>
+            <button
+              class="hl-btn"
+              data-len="Mid-Back"
+              onclick="setHairLen(this)"
+            >
+              Mid-Back
+            </button>
+            <button class="hl-btn" data-len="Waist" onclick="setHairLen(this)">
+              Waist+
+            </button>
+          </div>
+
+          <!-- action buttons pushed to right -->
+          <div style="margin-left: auto; display: flex; gap: 6px">
+            <button class="btn btn-ghost" onclick="repeatLastVisit()">
+              <span class="material-symbols-outlined" style="font-size: 14px"
+                >replay</span
+              >Repeat Last
+            </button>
+            <button class="btn btn-ghost" onclick="viewHistory()">
+              <span class="material-symbols-outlined" style="font-size: 14px"
+                >history</span
+              >History
+            </button>
+          </div>
+        </div>
+
+        <!-- Category tabs -->
+        <div class="cat-bar" id="catTabs"></div>
+
+        <!-- Service tiles -->
+        <div class="svc-scroll" id="svcScrollArea">
+          <div class="svc-grid" id="svcGrid"></div>
+
+          <!-- Visit History (shown inline when viewHistory() is called) -->
+          <div id="historyBox" style="display: none"></div>
+        </div>
+
+        <!-- Legacy hidden container for compat -->
+        <div id="servicesContainer" style="display: none"></div>
+      </div>
+
+      <!-- ══ RIGHT: CART / BILLING ══ -->
+      <div class="panel-cart">
+        <div class="cart-header">
+          <div class="cart-title">
+            <span>Current Bill</span>
+            <button class="cart-clear-btn" onclick="clearCart()">
+              Clear all
+            </button>
+          </div>
+          <!-- Customer name badge if known -->
+          <div
+            id="cartCustomerBadge"
+            style="
+              display: none;
+              background: var(--acc-dim);
+              border: 1px solid var(--acc-border);
+              border-radius: 20px;
+              padding: 3px 10px;
+              font-size: 11px;
+              color: var(--acc);
+              display: inline-block;
+            "
+          ></div>
+        </div>
+
+        <div class="cart-items" id="cartItemsList">
+          <div class="cart-empty" id="cartEmpty">
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 28px; color: var(--txt-dim)"
+              >receipt_long</span
+            >
+            <span>Select services to add</span>
+          </div>
+        </div>
+
+        <div class="cart-footer">
+          <div>
+            <div class="toggle-label">Staff</div>
+            <div class="toggle-row">
+              <button class="tog-btn staff-btn active" data-staff="Senior">
+                Senior
+              </button>
+              <button class="tog-btn staff-btn" data-staff="Junior">
+                Junior
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="toggle-label">Payment</div>
+            <div class="toggle-row">
+              <button class="tog-btn payment-btn active" data-mode="UPI">
+                <span class="material-symbols-outlined" style="font-size: 13px"
+                  >account_balance</span
+                >UPI
+              </button>
+              <button class="tog-btn payment-btn" data-mode="Cash">
+                <span class="material-symbols-outlined" style="font-size: 13px"
+                  >payments</span
+                >Cash
+              </button>
+            </div>
+          </div>
+
+          <div class="total-display">
+            <div>
+              <div class="total-label">Total Due</div>
+              <div
+                style="font-size: 10px; color: var(--txt-dim); margin-top: 2px"
+                id="cartCount"
+              >
+                0 services
+              </div>
+            </div>
+            <div class="total-amount">
+              <span class="total-currency">₹</span><span id="total">0</span>
+            </div>
+          </div>
+
+          <label class="wa-row">
+            <input type="checkbox" id="autoWhatsapp" />
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 14px; color: var(--whatsapp)"
+              >chat</span
+            >
+            Send WhatsApp receipt
+          </label>
+
+          <button type="button" class="save-btn" onclick="saveVisit()">
+            <span class="material-symbols-outlined" style="font-size: 18px"
+              >check_circle</span
+            >
+            Save Visit
+          </button>
+          <p id="status" class="status-msg"></p>
+        </div>
+      </div>
+    </div>
+    <!-- .app-shell -->
+
+    <!-- ══════ ADMIN PANEL DRAWER ══════ -->
+    <div id="adminPanel" class="hidden">
+      <div
+        style="flex: 1; cursor: pointer"
+        onclick="document.getElementById('adminPanel').classList.add('hidden')"
+      ></div>
+
+      <div class="admin-drawer" onclick="event.stopPropagation()">
+        <div class="admin-header">
+          <span class="admin-title">⚙ Admin <span>Panel</span></span>
+          <button class="modal-close" id="closeAdmin">✕</button>
+        </div>
+
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="dashboard">
+            Dashboard
+          </button>
+          <button class="admin-tab" data-tab="services">Services</button>
+          <button class="admin-tab" data-tab="crm">CRM &amp; Offers</button>
+          <button class="admin-tab" data-tab="data">Data &amp; Reports</button>
+        </div>
+
+        <div class="admin-body">
+          <!-- DASHBOARD TAB -->
+          <div class="tab-pane active" id="dashboardTab">
+            <div class="dash-stats">
+              <div class="dash-stat">
+                <div class="dash-stat-label">Today</div>
+                <div class="dash-stat-val">₹<span id="dashToday">—</span></div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">This Week</div>
+                <div class="dash-stat-val">₹<span id="dashWeek">—</span></div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">This Month</div>
+                <div class="dash-stat-val">₹<span id="dashMonth">—</span></div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-title">UPI vs Cash Revenue</div>
+              <canvas id="paymentChart"></canvas>
+            </div>
+            <div class="leaderboard-card">
+              <div class="leaderboard-title">Staff Leaderboard</div>
+              <div id="staffLeaderboard"></div>
+            </div>
+            <!-- History section in admin -->
+            <div style="margin-top: 16px">
+              <div class="data-section-label" style="margin-bottom: 8px">
+                Visit History
+              </div>
+              <div class="date-filter-row">
+                <input type="date" id="fromDate" />
+                <input type="date" id="toDate" />
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  style="padding: 6px 12px; font-size: 11px"
+                  onclick="filterByDate()"
+                >
+                  Filter
+                </button>
+              </div>
+              <div
+                id="adminHistoryBox"
+                style="max-height: 240px; overflow-y: auto"
+              ></div>
+            </div>
+          </div>
+
+          <!-- SERVICES TAB -->
+          <div class="tab-pane" id="servicesTab">
+            <div class="svc-add-row">
+              <div class="field" style="min-width: 130px">
+                <span class="field-label">Service Name</span>
+                <input
+                  id="adminServiceName"
+                  placeholder="e.g. Haircut, Facial…"
+                />
+              </div>
+              <div class="field field-price">
+                <span class="field-label">Price ₹</span>
+                <input id="adminServicePrice" type="number" placeholder="0" />
+              </div>
+              <div class="field" style="max-width: 82px; flex: none">
+                <span class="field-label">Gender</span>
+                <select id="adminServiceGender">
+                  <option value="men">Men</option>
+                  <option value="women">Women</option>
+                </select>
+              </div>
+              <div class="field" style="max-width: 100px; flex: none">
+                <span class="field-label">Category</span>
+                <select id="adminServiceCat" placeholder="e.g. Hair">
+                  <option>General</option>
+                  <option>Haircut</option>
+                  <option>Hair Spa</option>
+                  <option>Hair Color</option>
+                  <option>Skin Care</option>
+                  <option>Styling</option>
+                </select>
+              </div>
+              <button
+                class="btn btn-primary"
+                style="align-self: flex-end; height: 35px; padding: 0 14px"
+                onclick="addAdminService()"
+              >
+                + Add
+              </button>
+            </div>
+            <div style="display: flex; gap: 6px; margin-bottom: 10px">
+              <input
+                type="text"
+                id="adminSvcSearch"
+                placeholder="Search services…"
+                oninput="filterAdminSvcList()"
+                style="flex: 1"
+              />
+              <select
+                id="adminSvcGenderFilter"
+                onchange="filterAdminSvcList()"
+                style="width: 82px"
+              >
+                <option value="all">All</option>
                 <option value="men">Men</option>
                 <option value="women">Women</option>
               </select>
             </div>
-            <div class="field" style="max-width:110px;flex:none;">
-              <span class="field-label">Category</span>
-              <input id="adminServiceCat" placeholder="e.g. Haircut" />
+            <div id="adminServiceList"></div>
+          </div>
+
+          <!-- CRM TAB -->
+          <div class="tab-pane" id="crmTab">
+            <div class="field">
+              <span class="field-label">Offer Message</span>
+              <textarea
+                id="offerMessage"
+                oninput="toggleSendButtons()"
+                placeholder="Enter your offer or promotion message…"
+              ></textarea>
             </div>
-            <button class="btn btn-primary" style="align-self:flex-end;height:38px;padding:0 18px;" onclick="addAdminService()">+ Add</button>
-          </div>
-          <div style="display:flex;gap:6px;margin-bottom:10px;">
-            <input type="text" id="adminSvcSearch" placeholder="Search services…" oninput="filterAdminSvcList()" style="flex:1;" />
-            <select id="adminSvcGenderFilter" onchange="filterAdminSvcList()" style="width:90px;">
-              <option value="all">All</option><option value="men">Men</option><option value="women">Women</option>
-            </select>
-          </div>
-          <div id="adminServiceList"></div>
-        </div>
-
-        <!-- ── CRM TAB ── -->
-        <div class="tab-pane" id="crmTab">
-          <div class="field">
-            <span class="field-label">Offer Message</span>
-            <textarea id="offerMessage" oninput="toggleSendButtons()" placeholder="Enter your offer or promotion message…"></textarea>
-          </div>
-          <div class="crm-filter-row">
-            <select id="filterType">
-              <option value="all">All Customers</option>
-              <option value="today">Visited Today</option>
-              <option value="week">Visited This Week</option>
-              <option value="inactive">Inactive (2+ months)</option>
-            </select>
-            <input type="text" id="searchInput" placeholder="Search name or phone…" oninput="filterCustomers()" />
-            <button type="button" class="btn btn-secondary" style="padding:8px 14px;font-size:12px;" onclick="loadCustomers()">Load</button>
-          </div>
-          <div id="customerList"></div>
-        </div>
-
-        <!-- ── DATA & REPORTS TAB ── -->
-        <div class="tab-pane" id="dataTab">
-
-          <div class="data-section">
-            <div class="data-section-label">Data Management</div>
-            <div class="data-grid">
-              <button class="data-action-btn" onclick="backupData()">
-                <span class="dab-icon">⬆</span>
-                <span class="dab-label">Backup Data</span>
-                <span class="dab-desc">Save to a safe location</span>
-              </button>
-              <button class="data-action-btn" onclick="restoreData()">
-                <span class="dab-icon">⬇</span>
-                <span class="dab-label">Restore Data</span>
-                <span class="dab-desc">Overwrite from backup file</span>
-              </button>
-              <button class="data-action-btn" onclick="exportVisits()">
-                <span class="dab-icon">📊</span>
-                <span class="dab-label">Export Visits</span>
-                <span class="dab-desc">Download as spreadsheet</span>
-              </button>
-              <button class="data-action-btn danger" onclick="clearData()">
-                <span class="dab-icon">🗑</span>
-                <span class="dab-label">Clear All Data</span>
-                <span class="dab-desc">Permanent — cannot undo</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="data-section">
-            <div class="data-section-label">Download Report</div>
-            <div class="report-section">
-              <select id="reportType2" onchange="handleReportType2()">
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="custom">Custom Range</option>
+            <div class="crm-filter-row">
+              <select id="filterType" style="flex: 1; min-width: 130px">
+                <option value="all">All Customers</option>
+                <option value="today">Visited Today</option>
+                <option value="week">Visited This Week</option>
+                <option value="inactive">Inactive (2+ months)</option>
               </select>
-              <div id="customDates2" style="display:none;margin-bottom:10px;">
-                <input type="date" id="reportFrom2" style="margin-bottom:6px;" />
-                <input type="date" id="reportTo2" />
-              </div>
-              <button class="btn btn-primary" style="width:100%;" onclick="downloadReport2()">⬇ Download Report</button>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search name or phone…"
+                oninput="filterCustomers()"
+                style="flex: 1"
+              />
+              <button
+                type="button"
+                class="btn btn-secondary"
+                style="padding: 6px 12px; font-size: 11px"
+                onclick="loadCustomers()"
+              >
+                Load
+              </button>
             </div>
+            <div id="customerList"></div>
           </div>
 
+          <!-- DATA & REPORTS TAB -->
+          <div class="tab-pane" id="dataTab">
+            <div class="data-section">
+              <div class="data-section-label">Data Management</div>
+              <div class="data-grid">
+                <button class="data-action-btn" onclick="backupData()">
+                  <span class="dab-icon">⬆</span>
+                  <span class="dab-label">Backup Data</span>
+                  <span class="dab-desc">Save to a safe location</span>
+                </button>
+                <button class="data-action-btn" onclick="restoreData()">
+                  <span class="dab-icon">⬇</span>
+                  <span class="dab-label">Restore Data</span>
+                  <span class="dab-desc">Overwrite from backup</span>
+                </button>
+                <button class="data-action-btn" onclick="exportVisits()">
+                  <span class="dab-icon">📊</span>
+                  <span class="dab-label">Export Visits</span>
+                  <span class="dab-desc">Download as spreadsheet</span>
+                </button>
+                <button class="data-action-btn danger" onclick="clearData()">
+                  <span class="dab-icon">🗑</span>
+                  <span class="dab-label">Clear All Data</span>
+                  <span class="dab-desc">Permanent — cannot undo</span>
+                </button>
+              </div>
+            </div>
+            <div class="data-section">
+              <div class="data-section-label">Download Report</div>
+              <div class="report-section">
+                <select
+                  id="reportType2"
+                  onchange="handleReportType2()"
+                  style="margin-bottom: 8px"
+                >
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="custom">Custom Range</option>
+                </select>
+                <div
+                  id="customDates2"
+                  style="display: none; margin-bottom: 8px"
+                >
+                  <input
+                    type="date"
+                    id="reportFrom2"
+                    style="margin-bottom: 5px"
+                  />
+                  <input type="date" id="reportTo2" />
+                </div>
+                <button
+                  class="btn btn-primary"
+                  style="width: 100%; padding: 9px"
+                  onclick="downloadReport2()"
+                >
+                  ⬇ Download Report
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
-  </div>
 
-</main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      /* ── THEME ── */
+      function setTheme(theme, dotEl) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        document
+          .querySelectorAll(".theme-dot")
+          .forEach((d) => d.classList.remove("active"));
+        if (dotEl) dotEl.classList.add("active");
+        else {
+          const dot = document.querySelector(`.theme-dot[data-t="${theme}"]`);
+          if (dot) dot.classList.add("active");
+        }
+      }
+      const savedTheme = localStorage.getItem("theme") || "gold";
+      const savedMode = localStorage.getItem("ui-mode") || "dark";
 
-<!-- ══════ FOOTER ══════ -->
-<footer class="bottom-bar">
-  <div class="footer-left">
-    <span class="footer-brand">IronStar</span>
-    <span>·</span>
-    <span>Local Edition</span>
-    <span id="footerDate"></span>
-  </div>
-  <span class="footer-credit">Crafted with ♥ by <span>Tushar Aradwad</span></span>
-</footer>
+      document.documentElement.setAttribute("data-mode", savedMode);
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      updateModeIcon();
+      setTheme(savedTheme);
 
-<script>
-  /* ── FOOTER DATE ── */
-  document.getElementById('footerDate').textContent =
-    '· ' + new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+      function toggleMode() {
+        const html = document.documentElement;
 
-  /* ── THEME SWITCHER ── */
-  function setTheme(theme, dotEl) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem("theme", theme);
+        const current = html.getAttribute("data-mode");
 
-  document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
-  if (dotEl) dotEl.classList.add('active');
-}
+        const next = current === "light" ? "dark" : "light";
 
-// LOAD SAVED THEME
-const savedTheme = localStorage.getItem("theme") || "gold";
-setTheme(savedTheme);
+        html.setAttribute("data-mode", next);
 
-document.querySelectorAll(".theme-dot").forEach(dot => {
-  if (dot.dataset.t === savedTheme) dot.classList.add("active");
-});
+        localStorage.setItem("ui-mode", next);
 
-  /* ── ADMIN PANEL TABS ── */
-  document.querySelectorAll('.admin-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const tab = btn.dataset.tab;
-      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-      document.getElementById(tab + 'Tab').classList.add('active');
-      // Load data when tab opens
-      if (tab === 'dashboard') loadDashboard();
-      if (tab === 'services') loadAdminServiceList();
-    });
-  });
+        updateModeIcon();
+      }
 
-  /* ── ADMIN PANEL OPEN/CLOSE ── */
-  document.getElementById('adminBtn').onclick = () => {
-    document.getElementById('adminPanel').classList.remove('hidden');
-    loadDashboard();
-    // Sync dashboard income cards
-    const t = document.getElementById('todayIncome').textContent;
-    const w = document.getElementById('weekIncome').textContent;
-    const m = document.getElementById('monthIncome').textContent;
-    if (document.getElementById('dashToday')) document.getElementById('dashToday').textContent = t;
-    if (document.getElementById('dashWeek'))  document.getElementById('dashWeek').textContent  = w;
-    if (document.getElementById('dashMonth')) document.getElementById('dashMonth').textContent = m;
-  };
+      function updateModeIcon() {
+        const mode = document.documentElement.getAttribute("data-mode");
 
-  document.getElementById('closeAdmin').onclick = () => {
-    document.getElementById('adminPanel').classList.add('hidden');
-  };
+        const icon = document.getElementById("modeIcon");
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('serviceModal').classList.remove('open');
-      closeReportModal();
-    }
-  });
+        if (!icon) return;
 
-  /* ── ADMIN SERVICES TAB ── */
-  // Bridge: admin inputs map to the existing serviceName/servicePrice IDs renderer.js uses
-  // We use separate admin inputs and call the same backend via window.api directly
-  async function addAdminService() {
-    const name  = document.getElementById('adminServiceName').value.trim();
-    const price = document.getElementById('adminServicePrice').value.trim();
-    if (!name || !price) { showStatus('Enter service name and price'); return; }
-    // Temporarily populate the original inputs renderer.js uses, then call addNewService
-    document.getElementById('serviceName').value  = name;
-    document.getElementById('servicePrice').value = price;
-    await addNewService();
-    document.getElementById('adminServiceName').value  = '';
-    document.getElementById('adminServicePrice').value = '';
-    loadAdminServiceList();
-  }
+        icon.textContent = mode === "light" ? "light_mode" : "dark_mode";
+      }
 
-  async function loadAdminServiceList() {
-    if (!window.api) return;
-    const services = await window.api.getServices();
-    const container = document.getElementById('adminServiceList');
-    container.innerHTML = '';
-    services.forEach(s => {
-      const row = document.createElement('div');
-      row.innerHTML = `
-        <span style="flex:1;font-size:13px;color:var(--text)">${s.name}</span>
-        <span style="font-size:11px;color:var(--text-dim);margin-right:8px">₹</span>
-        <input type="number" value="${s.price}" id="adminPrice-${s.id}"
-          style="width:70px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:12px;outline:none;"
-          onkeypress="if(event.key==='Enter') updateServicePrice(${s.id})"
-        />
-        <button class="btn btn-secondary" style="padding:5px 10px;font-size:11px;margin-left:6px;"
+      /* ── ADMIN PANEL TABS ── */
+      document.querySelectorAll(".admin-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".admin-tab")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          const tab = btn.dataset.tab;
+          document
+            .querySelectorAll(".tab-pane")
+            .forEach((p) => p.classList.remove("active"));
+          document.getElementById(tab + "Tab").classList.add("active");
+          if (tab === "dashboard") loadDashboard();
+          if (tab === "services") loadAdminServiceList();
+        });
+      });
+
+      /* ── ADMIN OPEN/CLOSE ── */
+      document.getElementById("adminBtn").onclick = () => {
+        document.getElementById("adminPanel").classList.remove("hidden");
+        loadDashboard();
+        const t = document.getElementById("todayIncome").textContent;
+        const w = document.getElementById("weekIncome").textContent;
+        const m = document.getElementById("monthIncome").textContent;
+        const dt = document.getElementById("dashToday");
+        const dw = document.getElementById("dashWeek");
+        const dm = document.getElementById("dashMonth");
+        if (dt) dt.textContent = t;
+        if (dw) dw.textContent = w;
+        if (dm) dm.textContent = m;
+      };
+      document.getElementById("closeAdmin").onclick = () =>
+        document.getElementById("adminPanel").classList.add("hidden");
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          document.getElementById("adminPanel").classList.add("hidden");
+          document.getElementById("serviceModal").classList.remove("open");
+          document.getElementById("reportModal").classList.remove("open");
+        }
+      });
+
+      /* ── ADMIN SERVICES ── */
+      async function addAdminService() {
+        const name = document.getElementById("adminServiceName").value.trim();
+        const price = document.getElementById("adminServicePrice").value.trim();
+        const gender =
+          document.getElementById("adminServiceGender")?.value || "men";
+        const category =
+          document.getElementById("adminServiceCat")?.value.trim() || "General";
+        if (!name || !price) {
+          showStatus("Enter service name and price");
+          return;
+        }
+        await window.api.addService({
+          name,
+          price: parseInt(price),
+          gender,
+          category,
+        });
+        document.getElementById("adminServiceName").value = "";
+        document.getElementById("adminServicePrice").value = "";
+        if (document.getElementById("adminServiceCat"))
+          document.getElementById("adminServiceCat").value = "";
+        loadAdminServiceList();
+        if (typeof loadGenderServices === "function") loadGenderServices();
+        if (typeof loadServices === "function") loadServices();
+      }
+
+      async function loadAdminServiceList() {
+        if (!window.api) return;
+        window._allAdminSvcs = await window.api.getServices();
+        renderAdminSvcList(window._allAdminSvcs);
+      }
+
+      function renderAdminSvcList(svcs) {
+        const container = document.getElementById("adminServiceList");
+        container.innerHTML = "";
+        if (!svcs.length) {
+          container.innerHTML =
+            '<div style="color:var(--txt-dim);font-size:12px;text-align:center;padding:16px;">No services found</div>';
+          return;
+        }
+        svcs.forEach((s) => {
+          const row = document.createElement("div");
+          row.innerHTML = `
+        <span class="svc-badge ${s.gender || "men"}">${s.gender === "women" ? "W" : "M"}</span>
+        <span class="svc-badge cat">${s.category || "General"}</span>
+        <span class="admin-service-name">
+  ${s.name}
+</span>
+        <span style="font-size:10px;color:var(--txt-dim);margin-right:3px;">₹</span>
+        <input
+  type="number"
+  value="${s.price}"
+  id="adminPrice-${s.id}"
+  class="admin-price-input"
+  onkeypress="if(event.key==='Enter') syncAndUpdate(${s.id})"
+/>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:10px;margin-left:5px;"
           onclick="syncAndUpdate(${s.id})">Update</button>
-        <button class="btn btn-danger" style="padding:5px 10px;font-size:11px;margin-left:4px;"
+        <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;margin-left:3px;"
           onclick="deleteServiceAndRefresh(${s.id})">Delete</button>
       `;
-      container.appendChild(row);
-    });
-  }
+          container.appendChild(row);
+        });
+      }
 
-  function syncAndUpdate(id) {
-    // Sync admin price input → original price input renderer.js expects
-    const adminVal = document.getElementById('adminPrice-' + id);
-    const origEl   = document.getElementById('price-' + id);
-    if (origEl && adminVal) origEl.value = adminVal.value;
-    updateServicePrice(id);
-    setTimeout(() => loadAdminServiceList(), 300);
-  }
+      function filterAdminSvcList() {
+        const q = (
+          document.getElementById("adminSvcSearch")?.value || ""
+        ).toLowerCase();
+        const g =
+          document.getElementById("adminSvcGenderFilter")?.value || "all";
+        const filtered = (window._allAdminSvcs || []).filter((s) => {
+          const matchG = g === "all" || s.gender === g;
+          const matchQ =
+            !q ||
+            s.name.toLowerCase().includes(q) ||
+            (s.category || "").toLowerCase().includes(q);
+          return matchG && matchQ;
+        });
+        renderAdminSvcList(filtered);
+      }
 
-  async function deleteServiceAndRefresh(id) {
-    await deleteService(id);
-    loadAdminServiceList();
-  }
+      function syncAndUpdate(id) {
+        const adminVal = document.getElementById("adminPrice-" + id);
+        const origEl = document.getElementById("price-" + id);
+        if (origEl && adminVal) origEl.value = adminVal.value;
+        if (typeof updateServicePrice === "function") updateServicePrice(id);
+        setTimeout(() => {
+          loadAdminServiceList();
+          if (typeof loadGenderServices === "function") loadGenderServices();
+        }, 300);
+      }
 
-  /* ── REPORT MODAL (admin data tab) ── */
-  function handleReportType2() {
-    const type = document.getElementById('reportType2').value;
-    document.getElementById('customDates2').style.display = type === 'custom' ? 'block' : 'none';
-  }
+      async function deleteServiceAndRefresh(id) {
+        if (typeof deleteService === "function") await deleteService(id);
+        loadAdminServiceList();
+        if (typeof loadGenderServices === "function") loadGenderServices();
+      }
 
-  async function downloadReport2() {
-    const type = document.getElementById('reportType2').value;
-    // Sync to the main reportType select and reuse existing downloadReport()
-    document.getElementById('reportType').value = type;
-    if (type === 'custom') {
-      document.getElementById('reportFrom').value = document.getElementById('reportFrom2').value;
-      document.getElementById('reportTo').value   = document.getElementById('reportTo2').value;
-    }
-    await downloadReport();
-  }
+      /* ── REPORT MODAL ── */
+      function openReportModal() {
+        document.getElementById("reportModal").classList.add("open");
+      }
+      function closeReportModal() {
+        document.getElementById("reportModal").classList.remove("open");
+      }
+      function handleReportType() {
+        const t = document.getElementById("reportType").value;
+        document.getElementById("customDates").style.display =
+          t === "custom" ? "flex" : "none";
+      }
+      function handleReportType2() {
+        const t = document.getElementById("reportType2").value;
+        document.getElementById("customDates2").style.display =
+          t === "custom" ? "block" : "none";
+      }
+      async function downloadReport2() {
+        const type = document.getElementById("reportType2").value;
+        document.getElementById("reportType").value = type;
+        if (type === "custom") {
+          document.getElementById("reportFrom").value =
+            document.getElementById("reportFrom2").value;
+          document.getElementById("reportTo").value =
+            document.getElementById("reportTo2").value;
+        }
+        if (typeof downloadReport === "function") await downloadReport();
+      }
 
-  /* ── MODAL BACKDROP ── */
-  window.addEventListener('click', e => {
-    const modal = document.getElementById('serviceModal');
-    if (e.target === modal) modal.classList.remove('open');
-  });
+      /* ── HISTORY display toggle ── */
+      // Override viewHistory in renderer.js to show inline in left panel
+      window._origViewHistory = null; // will be set after renderer.js loads
 
-  function showStatus(msg) {
-    const el = document.getElementById('status');
-    el.innerText = msg;
-    el.style.animation = 'none';
-    void el.offsetWidth;
-    el.style.animation = '';
-  }
-</script>
+      function showStatus(msg) {
+        const el = document.getElementById("status");
+        el.innerText = msg;
+        el.style.animation = "none";
+        void el.offsetWidth;
+        el.style.animation = "";
+      }
 
-<script src="renderer.js"></script>
-</body>
+      window.addEventListener("load", () => {
+        const nameEl = document.getElementById("name");
+
+        if (nameEl) {
+          nameEl.addEventListener("input", updateCartCustomer);
+
+          nameEl.addEventListener("blur", updateCartCustomer);
+        }
+
+        updateCartCustomer();
+      });
+      function updateCartCustomer() {
+        const name = document.getElementById("name")?.value?.trim();
+        const badge = document.getElementById("cartCustomerBadge");
+        if (!badge) return;
+        if (name) {
+          badge.style.display = "inline-block";
+          badge.textContent = name;
+        } else {
+          badge.style.display = "none";
+        }
+      }
+    </script>
+
+    <script src="renderer.js"></script>
+  </body>
 </html>
