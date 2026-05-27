@@ -1447,7 +1447,15 @@ document.addEventListener(
 );
 
 function handleKeyboardNavigation(e) {
+const suggestionsBox =
+  document.getElementById("suggestionsBox");
 
+if (
+  suggestionsBox &&
+  suggestionsBox.style.display === "block"
+) {
+  return;
+}
   const tiles =
     [...document.querySelectorAll(".svc-btn")];
 
@@ -1479,7 +1487,8 @@ function handleKeyboardNavigation(e) {
 
   // DOWN
   if (e.key === "ArrowDown") {
-
+ e.preventDefault();
+  e.stopPropagation();
     focusedServiceIndex =
       Math.min(
         focusedServiceIndex + 4,
@@ -1491,7 +1500,8 @@ function handleKeyboardNavigation(e) {
 
   // UP
   if (e.key === "ArrowUp") {
-
+ e.preventDefault();
+  e.stopPropagation();
     focusedServiceIndex =
       Math.max(
         focusedServiceIndex - 4,
@@ -1504,8 +1514,12 @@ function handleKeyboardNavigation(e) {
   // ENTER
   if (e.key === "Enter") {
 
-    tiles[focusedServiceIndex]?.click();
-  }
+  e.preventDefault();
+
+  e.stopPropagation();
+
+  selectCustomer(selectedIndex);
+}
 
   // CTRL + S
   if (e.ctrlKey && e.key.toLowerCase() === "s") {
